@@ -8,8 +8,8 @@ export default function SettingsScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Profile</Text>
-        <Text>John Doe</Text>
-        <Text>john.doe@email.com</Text>
+        <Text>koshiv sharma</Text>
+        <Text>koshiv.sharma@email.com</Text>
       </View>
 
       <View style={styles.card}>
