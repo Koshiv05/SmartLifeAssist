@@ -9,7 +9,7 @@ export default function MainScreen() {
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Next Task</Text>
         <Text style={styles.cardTitle}>Complete project report</Text>
-        <Text style={styles.cardSub}>Due: 2:00 PM</Text>
+        <Text style={styles.cardSub}>Due: 5:00 PM</Text>
       </View>
 
       <View style={styles.card}>
