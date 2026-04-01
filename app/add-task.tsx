@@ -4,76 +4,142 @@ import { router } from 'expo-router';
 export default function AddTaskScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Task</Text>
+      <View style={styles.topBar}>
+        <Text style={styles.topBarTitle}>Add Task</Text>
+      </View>
 
-      <Text style={styles.label}>Task Title</Text>
-      <TextInput style={styles.input} placeholder="Enter task title" />
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Task Title"
+          placeholderTextColor="#666"
+        />
 
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Enter description"
-        multiline
-      />
+        <TextInput
+          style={styles.textArea}
+          placeholder="Description"
+          placeholderTextColor="#666"
+          multiline
+          textAlignVertical="top"
+        />
 
-      <Text style={styles.label}>Due Time</Text>
-      <TextInput style={styles.input} placeholder="--:--" />
+        <View style={styles.timeWrapper}>
+          <Text style={styles.timeLabel}>Due Time</Text>
+          <TextInput
+            style={styles.timeInput}
+            placeholder="--:--"
+            placeholderTextColor="#333"
+          />
+        </View>
+      </View>
 
-      <View style={styles.buttonRow}>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Save</Text>
+      <View style={styles.bottomButtons}>
+        <Pressable style={styles.saveButton}>
+          <Text style={styles.buttonText}>SAVE</Text>
         </Pressable>
 
-        <Pressable style={styles.button} onPress={() => router.back()}>
-          <Text style={styles.buttonText}>Cancel</Text>
+        <Pressable style={styles.cancelButton} onPress={() => router.back()}>
+          <Text style={styles.buttonText}>CANCEL</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
+const PURPLE = '#9C27B0';
+const GREEN = '#4CAF50';
+const RED = '#E53935';
+const LIGHT_BG = '#F2F2F2';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
-    padding: 20,
+    backgroundColor: LIGHT_BG,
+    paddingBottom: 18,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 20,
+  topBar: {
+    backgroundColor: PURPLE,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    marginTop: 18,
+    marginHorizontal: 16,
+    elevation: 3,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    marginTop: 10,
+  topBarTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  formContainer: {
+    marginTop: 14,
+    marginHorizontal: 16,
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#bbb',
-    padding: 12,
+    borderColor: '#bdbdbd',
+    borderRadius: 3,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 16,
+    marginBottom: 12,
   },
   textArea: {
-    height: 120,
-    textAlignVertical: 'top',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#bdbdbd',
+    borderRadius: 3,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    fontSize: 16,
+    height: 130,
+    marginBottom: 12,
   },
-  buttonRow: {
+  timeWrapper: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#bdbdbd',
+    borderRadius: 3,
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 12,
+  },
+  timeLabel: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 6,
+  },
+  timeInput: {
+    fontSize: 18,
+    color: '#111',
+    paddingVertical: 4,
+  },
+  bottomButtons: {
+    marginTop: 'auto',
     flexDirection: 'row',
     gap: 12,
-    marginTop: 30,
+    marginHorizontal: 16,
+    paddingTop: 16,
   },
-  button: {
+  saveButton: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#333',
-    backgroundColor: '#fff',
-    paddingVertical: 14,
+    backgroundColor: GREEN,
+    paddingVertical: 15,
     alignItems: 'center',
+    borderRadius: 3,
+    elevation: 2,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: RED,
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderRadius: 3,
+    elevation: 2,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
