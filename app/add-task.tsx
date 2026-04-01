@@ -1,48 +1,51 @@
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddTaskScreen() {
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>Add Task</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <Text style={styles.topBarTitle}>Add Task</Text>
+        </View>
 
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Task Title"
-          placeholderTextColor="#666"
-        />
-
-        <TextInput
-          style={styles.textArea}
-          placeholder="Description"
-          placeholderTextColor="#666"
-          multiline
-          textAlignVertical="top"
-        />
-
-        <View style={styles.timeWrapper}>
-          <Text style={styles.timeLabel}>Due Time</Text>
+        <View style={styles.formContainer}>
           <TextInput
-            style={styles.timeInput}
-            placeholder="--:--"
-            placeholderTextColor="#333"
+            style={styles.input}
+            placeholder="Task Title"
+            placeholderTextColor="#666"
           />
+
+          <TextInput
+            style={styles.textArea}
+            placeholder="Description"
+            placeholderTextColor="#666"
+            multiline
+            textAlignVertical="top"
+          />
+
+          <View style={styles.timeWrapper}>
+            <Text style={styles.timeLabel}>Due Time</Text>
+            <TextInput
+              style={styles.timeInput}
+              placeholder="--:--"
+              placeholderTextColor="#333"
+            />
+          </View>
+        </View>
+
+        <View style={styles.bottomButtons}>
+          <Pressable style={styles.saveButton}>
+            <Text style={styles.buttonText}>SAVE</Text>
+          </Pressable>
+
+          <Pressable style={styles.cancelButton} onPress={() => router.back()}>
+            <Text style={styles.buttonText}>CANCEL</Text>
+          </Pressable>
         </View>
       </View>
-
-      <View style={styles.bottomButtons}>
-        <Pressable style={styles.saveButton}>
-          <Text style={styles.buttonText}>SAVE</Text>
-        </Pressable>
-
-        <Pressable style={styles.cancelButton} onPress={() => router.back()}>
-          <Text style={styles.buttonText}>CANCEL</Text>
-        </Pressable>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -52,18 +55,19 @@ const RED = '#E53935';
 const LIGHT_BG = '#F2F2F2';
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: LIGHT_BG,
+  },
   container: {
     flex: 1,
     backgroundColor: LIGHT_BG,
-    paddingBottom: 18,
   },
   topBar: {
+    width: '100%',
     backgroundColor: PURPLE,
     paddingVertical: 18,
-    paddingHorizontal: 18,
-    marginTop: 18,
-    marginHorizontal: 16,
-    elevation: 3,
+    paddingHorizontal: 16,
   },
   topBarTitle: {
     color: '#fff',
@@ -71,41 +75,42 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   formContainer: {
-    marginTop: 14,
-    marginHorizontal: 16,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#bdbdbd',
-    borderRadius: 3,
+    borderRadius: 4,
     paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingVertical: 16,
     fontSize: 16,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   textArea: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#bdbdbd',
-    borderRadius: 3,
+    borderRadius: 4,
     paddingHorizontal: 14,
-    paddingTop: 14,
+    paddingTop: 16,
     fontSize: 16,
-    height: 130,
-    marginBottom: 12,
+    height: 140,
+    marginBottom: 14,
   },
   timeWrapper: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#bdbdbd',
-    borderRadius: 3,
+    borderRadius: 4,
     paddingHorizontal: 14,
-    paddingTop: 8,
-    paddingBottom: 12,
+    paddingTop: 10,
+    paddingBottom: 14,
   },
   timeLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#555',
     marginBottom: 6,
   },
@@ -115,26 +120,29 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   bottomButtons: {
-    marginTop: 'auto',
     flexDirection: 'row',
     gap: 12,
-    marginHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#d9d9d9',
+    backgroundColor: LIGHT_BG,
   },
   saveButton: {
     flex: 1,
     backgroundColor: GREEN,
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 3,
+    borderRadius: 4,
     elevation: 2,
   },
   cancelButton: {
     flex: 1,
     backgroundColor: RED,
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 3,
+    borderRadius: 4,
     elevation: 2,
   },
   buttonText: {

@@ -1,65 +1,76 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MainScreen() {
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>SmartLife Assist</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <Text style={styles.topBarTitle}>SmartLife Assist</Text>
+        </View>
 
-      <Text style={styles.screenLabel}>Main Activity</Text>
+        <Text style={styles.screenLabel}>Main Activity</Text>
 
-      <View style={styles.taskCard}>
-        <View style={styles.taskRow}>
-          <View style={styles.checkCircle}>
-            <Text style={styles.checkMark}>✓</Text>
+        <View style={styles.content}>
+          <View style={styles.taskCard}>
+            <View style={styles.taskRow}>
+              <View style={styles.checkCircle}>
+                <Text style={styles.checkMark}>✓</Text>
+              </View>
+
+              <View style={styles.taskTextContainer}>
+                <Text style={styles.taskLabel}>Next Task</Text>
+                <Text style={styles.taskTime}>05:30PM</Text>
+                <Text style={styles.taskTitle}>Complete project report</Text>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.taskTextContainer}>
-            <Text style={styles.taskLabel}>Next Task</Text>
-            <Text style={styles.taskTime}>05:30PM</Text>
-            <Text style={styles.taskTitle}>Complete project report</Text>
+          <View style={styles.middleButtons}>
+            <Pressable style={styles.reminderButton}>
+              <Text style={styles.middleButtonTextWhite}>SET REMINDER</Text>
+            </Pressable>
+
+            <Pressable style={styles.aiButton}>
+              <Text style={styles.middleButtonTextWhite}>AI SUGGESTIONS</Text>
+            </Pressable>
+
+            <Pressable style={styles.detailsButton}>
+              <Text style={styles.middleButtonTextDark}>VIEW TASK DETAILS</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.suggestionCard}>
+            <Text style={styles.suggestionTitle}>AI Suggestion</Text>
+            <Text style={styles.suggestionText}>
+              Based on your schedule, consider starting the project report now to avoid
+              last-minute rush.
+            </Text>
           </View>
         </View>
+
+        <View style={styles.bottomNav}>
+          <Pressable
+            style={styles.bottomButtonGreen}
+            onPress={() => router.push('/add-task')}
+          >
+            <Text style={styles.bottomButtonTextWhite}>ADD TASK</Text>
+          </Pressable>
+
+          <Pressable style={styles.bottomButtonRed}>
+            <Text style={styles.bottomButtonTextWhite}>EMERGENCY</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.bottomButtonOutline}
+            onPress={() => router.push('/settings')}
+          >
+            <Text style={styles.bottomButtonTextBlue}>SETTINGS</Text>
+          </Pressable>
+        </View>
       </View>
-
-      <View style={styles.middleButtons}>
-        <Pressable style={styles.reminderButton}>
-          <Text style={styles.middleButtonTextWhite}>SET REMINDER</Text>
-        </Pressable>
-
-        <Pressable style={styles.aiButton}>
-          <Text style={styles.middleButtonTextWhite}>AI SUGGESTIONS</Text>
-        </Pressable>
-
-        <Pressable style={styles.detailsButton}>
-          <Text style={styles.middleButtonTextDark}>VIEW TASK DETAILS</Text>
-        </Pressable>
-      </View>
-
-      <View style={styles.suggestionCard}>
-        <Text style={styles.suggestionTitle}>AI Suggestion</Text>
-        <Text style={styles.suggestionText}>
-          Based on your schedule, consider starting the project report now to avoid
-          last-minute rush.
-        </Text>
-      </View>
-
-      <View style={styles.bottomNav}>
-        <Pressable style={styles.bottomButtonGreen} onPress={() => router.push('/add-task')}>
-          <Text style={styles.bottomButtonTextWhite}>ADD TASK</Text>
-        </Pressable>
-
-        <Pressable style={styles.bottomButtonRed}>
-          <Text style={styles.bottomButtonTextWhite}>EMERGENCY</Text>
-        </Pressable>
-
-        <Pressable style={styles.bottomButtonOutline} onPress={() => router.push('/settings')}>
-          <Text style={styles.bottomButtonTextBlue}>SETTINGS</Text>
-        </Pressable>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -68,41 +79,44 @@ const RED = '#FF4438';
 const YELLOW = '#FFC107';
 const GREEN = '#4CAF50';
 const LIGHT_BG = '#F2F2F2';
-const CARD_BG = '#F7EEF8';
+const CARD_BG = '#F4EAF5';
 const BLUE = '#1976D2';
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: LIGHT_BG,
+  },
   container: {
     flex: 1,
     backgroundColor: LIGHT_BG,
-    paddingBottom: 20,
   },
   topBar: {
+    width: '100%',
     backgroundColor: PURPLE,
     paddingVertical: 18,
-    paddingHorizontal: 18,
-    marginTop: 18,
-    marginHorizontal: 16,
-    elevation: 3,
+    paddingHorizontal: 16,
   },
   topBarTitle: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
   screenLabel: {
     textAlign: 'center',
-    marginTop: 12,
-    marginBottom: 6,
     color: '#666',
     fontSize: 13,
+    marginTop: 12,
+    marginBottom: 10,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
   },
   taskCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 3,
+    padding: 18,
+    borderRadius: 4,
     elevation: 2,
   },
   taskRow: {
@@ -110,129 +124,125 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: GREEN,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: 16,
   },
   checkMark: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
   },
   taskTextContainer: {
     flex: 1,
   },
   taskLabel: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#777',
     marginBottom: 4,
   },
   taskTime: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '700',
     color: '#111',
   },
   taskTitle: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#222',
     marginTop: 4,
   },
   middleButtons: {
-    marginTop: 14,
-    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   reminderButton: {
     backgroundColor: RED,
-    paddingVertical: 14,
+    paddingVertical: 18,
     alignItems: 'center',
-    borderTopLeftRadius: 3,
-    borderTopRightRadius: 3,
   },
   aiButton: {
     backgroundColor: PURPLE,
-    paddingVertical: 14,
+    paddingVertical: 18,
     alignItems: 'center',
   },
   detailsButton: {
     backgroundColor: YELLOW,
-    paddingVertical: 14,
+    paddingVertical: 18,
     alignItems: 'center',
-    borderBottomLeftRadius: 3,
-    borderBottomRightRadius: 3,
   },
   middleButtonTextWhite: {
     color: '#fff',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 15,
   },
   middleButtonTextDark: {
     color: '#222',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 15,
   },
   suggestionCard: {
     backgroundColor: CARD_BG,
-    marginHorizontal: 16,
     marginTop: 18,
-    padding: 14,
-    borderRadius: 3,
+    padding: 16,
+    borderRadius: 4,
     elevation: 2,
   },
   suggestionTitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#666',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   suggestionText: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
     color: '#222',
   },
   bottomNav: {
-    marginTop: 'auto',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-    marginHorizontal: 16,
+    gap: 10,
+    paddingHorizontal: 16,
     paddingTop: 14,
+    paddingBottom: 12,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: '#d9d9d9',
+    backgroundColor: LIGHT_BG,
   },
   bottomButtonGreen: {
     flex: 1,
     backgroundColor: GREEN,
-    paddingVertical: 14,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   bottomButtonRed: {
     flex: 1,
     backgroundColor: '#E53935',
-    paddingVertical: 14,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   bottomButtonOutline: {
     flex: 1,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#90CAF9',
-    paddingVertical: 14,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   bottomButtonTextWhite: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
   },
   bottomButtonTextBlue: {
     color: BLUE,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
   },
 });
