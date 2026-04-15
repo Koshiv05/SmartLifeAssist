@@ -1,8 +1,46 @@
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { loadTasks, saveTasks } from '../services/storage';
+import { Task } from '../types/task';
 
 export default function AddTaskScreen() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [dueTime, setDueTime] = useState('');
+
+  async function handleSave() {
+    if (!title.trim() || !description.trim() || !dueTime.trim()) {
+      Alert.alert('Missing information', 'Please fill in all fields before saving.');
+      return;
+    }
+
+    try {
+      const existingTasks = await loadTasks();
+
+      const newTask: Task = {
+        id: Date.now().toString(),
+        title: title.trim(),
+        description: description.trim(),
+        dueTime: dueTime.trim(),
+        reminderType: '',
+      };
+
+      const updatedTasks = [...existingTasks, newTask];
+      await saveTasks(updatedTasks);
+
+      setTitle('');
+      setDescription('');
+      setDueTime('');
+
+      Alert.alert('Success', 'Task saved successfully.');
+      router.back();
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong while saving the task.');
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.container}>
@@ -15,6 +53,8 @@ export default function AddTaskScreen() {
             style={styles.input}
             placeholder="Task Title"
             placeholderTextColor="#666"
+            value={title}
+            onChangeText={setTitle}
           />
 
           <TextInput
@@ -23,6 +63,8 @@ export default function AddTaskScreen() {
             placeholderTextColor="#666"
             multiline
             textAlignVertical="top"
+            value={description}
+            onChangeText={setDescription}
           />
 
           <View style={styles.timeWrapper}>
@@ -31,12 +73,14 @@ export default function AddTaskScreen() {
               style={styles.timeInput}
               placeholder="--:--"
               placeholderTextColor="#333"
+              value={dueTime}
+              onChangeText={setDueTime}
             />
           </View>
         </View>
 
         <View style={styles.bottomButtons}>
-          <Pressable style={styles.saveButton}>
+          <Pressable style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.buttonText}>SAVE</Text>
           </Pressable>
 

@@ -1,8 +1,26 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCallback, useState } from 'react';
+import { loadTasks } from '../services/storage';
+import { Task } from '../types/task';
 
 export default function MainScreen() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchTasks() {
+        const savedTasks = await loadTasks();
+        setTasks(savedTasks);
+      }
+
+      fetchTasks();
+    }, [])
+  );
+
+  const latestTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.container}>
@@ -14,21 +32,28 @@ export default function MainScreen() {
 
         <View style={styles.content}>
           <View style={styles.taskCard}>
-            <View style={styles.taskRow}>
-              <View style={styles.checkCircle}>
-                <Text style={styles.checkMark}>✓</Text>
-              </View>
+            {latestTask ? (
+              <View style={styles.taskRow}>
+                <View style={styles.checkCircle}>
+                  <Text style={styles.checkMark}>✓</Text>
+                </View>
 
-              <View style={styles.taskTextContainer}>
-                <Text style={styles.taskLabel}>Next Task</Text>
-                <Text style={styles.taskTime}>05:30PM</Text>
-                <Text style={styles.taskTitle}>Complete project report</Text>
+                <View style={styles.taskTextContainer}>
+                  <Text style={styles.taskLabel}>Next Task</Text>
+                  <Text style={styles.taskTime}>{latestTask.dueTime}</Text>
+                  <Text style={styles.taskTitle}>{latestTask.title}</Text>
+                </View>
               </View>
-            </View>
+            ) : (
+              <View>
+                <Text style={styles.taskLabel}>Next Task</Text>
+                <Text style={styles.emptyState}>No tasks added yet.</Text>
+              </View>
+            )}
           </View>
 
           <View style={styles.middleButtons}>
-            <Pressable style={styles.reminderButton}>
+            <Pressable style={styles.reminderButton} onPress={() => router.push('/reminder' as any)}>
               <Text style={styles.middleButtonTextWhite}>SET REMINDER</Text>
             </Pressable>
 
@@ -36,7 +61,22 @@ export default function MainScreen() {
               <Text style={styles.middleButtonTextWhite}>AI SUGGESTIONS</Text>
             </Pressable>
 
-            <Pressable style={styles.detailsButton}>
+            <Pressable
+              style={styles.detailsButton}
+              onPress={() => {
+                if (latestTask) {
+                  router.push({
+                    pathname: '/task-details' as any,
+                    params: {
+                      id: latestTask.id,
+                      title: latestTask.title,
+                      description: latestTask.description,
+                      dueTime: latestTask.dueTime,
+                    },
+                  });
+                }
+              }}
+            >
               <Text style={styles.middleButtonTextDark}>VIEW TASK DETAILS</Text>
             </Pressable>
           </View>
@@ -154,6 +194,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#222',
     marginTop: 4,
+  },
+  emptyState: {
+    fontSize: 16,
+    color: '#444',
+    marginTop: 6,
   },
   middleButtons: {
     marginTop: 16,
