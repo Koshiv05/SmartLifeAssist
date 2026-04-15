@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useState } from 'react';
@@ -21,6 +21,19 @@ export default function MainScreen() {
 
   const latestTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
 
+  function openTaskDetails(task: Task) {
+    router.push({
+      pathname: '/task-details' as any,
+      params: {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate,
+        dueTime: task.dueTime,
+      },
+    });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.container}>
@@ -28,9 +41,9 @@ export default function MainScreen() {
           <Text style={styles.topBarTitle}>SmartLife Assist</Text>
         </View>
 
-        <Text style={styles.screenLabel}>Main Activity</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.screenLabel}>Main Activity</Text>
 
-        <View style={styles.content}>
           <View style={styles.taskCard}>
             {latestTask ? (
               <View style={styles.taskRow}>
@@ -39,14 +52,15 @@ export default function MainScreen() {
                 </View>
 
                 <View style={styles.taskTextContainer}>
-                  <Text style={styles.taskLabel}>Next Task</Text>
+                  <Text style={styles.taskLabel}>Latest Task</Text>
                   <Text style={styles.taskTime}>{latestTask.dueTime}</Text>
                   <Text style={styles.taskTitle}>{latestTask.title}</Text>
+                  <Text style={styles.taskDate}>{latestTask.dueDate}</Text>
                 </View>
               </View>
             ) : (
               <View>
-                <Text style={styles.taskLabel}>Next Task</Text>
+                <Text style={styles.taskLabel}>Latest Task</Text>
                 <Text style={styles.emptyState}>No tasks added yet.</Text>
               </View>
             )}
@@ -63,19 +77,7 @@ export default function MainScreen() {
 
             <Pressable
               style={styles.detailsButton}
-              onPress={() => {
-                if (latestTask) {
-                  router.push({
-                    pathname: '/task-details' as any,
-                    params: {
-                      id: latestTask.id,
-                      title: latestTask.title,
-                      description: latestTask.description,
-                      dueTime: latestTask.dueTime,
-                    },
-                  });
-                }
-              }}
+              onPress={() => latestTask && openTaskDetails(latestTask)}
             >
               <Text style={styles.middleButtonTextDark}>VIEW TASK DETAILS</Text>
             </Pressable>
@@ -88,13 +90,27 @@ export default function MainScreen() {
               last-minute rush.
             </Text>
           </View>
-        </View>
+
+          <Text style={styles.listHeading}>Saved Tasks</Text>
+
+          {tasks.length === 0 ? (
+            <View style={styles.listCard}>
+              <Text style={styles.emptyState}>No saved tasks available.</Text>
+            </View>
+          ) : (
+            tasks.map((task) => (
+              <Pressable key={task.id} style={styles.listCard} onPress={() => openTaskDetails(task)}>
+                <Text style={styles.listTaskTitle}>{task.title}</Text>
+                <Text style={styles.listTaskSub}>
+                  {task.dueDate} • {task.dueTime}
+                </Text>
+              </Pressable>
+            ))
+          )}
+        </ScrollView>
 
         <View style={styles.bottomNav}>
-          <Pressable
-            style={styles.bottomButtonGreen}
-            onPress={() => router.push('/add-task')}
-          >
+          <Pressable style={styles.bottomButtonGreen} onPress={() => router.push('/add-task')}>
             <Text style={styles.bottomButtonTextWhite}>ADD TASK</Text>
           </Pressable>
 
@@ -102,10 +118,7 @@ export default function MainScreen() {
             <Text style={styles.bottomButtonTextWhite}>EMERGENCY</Text>
           </Pressable>
 
-          <Pressable
-            style={styles.bottomButtonOutline}
-            onPress={() => router.push('/settings')}
-          >
+          <Pressable style={styles.bottomButtonOutline} onPress={() => router.push('/settings')}>
             <Text style={styles.bottomButtonTextBlue}>SETTINGS</Text>
           </Pressable>
         </View>
@@ -131,6 +144,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: LIGHT_BG,
   },
+  scrollContent: {
+    paddingBottom: 20,
+  },
   topBar: {
     width: '100%',
     backgroundColor: PURPLE,
@@ -149,12 +165,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 10,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
   taskCard: {
     backgroundColor: '#fff',
+    marginHorizontal: 16,
     padding: 18,
     borderRadius: 4,
     elevation: 2,
@@ -195,6 +208,11 @@ const styles = StyleSheet.create({
     color: '#222',
     marginTop: 4,
   },
+  taskDate: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
   emptyState: {
     fontSize: 16,
     color: '#444',
@@ -202,6 +220,7 @@ const styles = StyleSheet.create({
   },
   middleButtons: {
     marginTop: 16,
+    marginHorizontal: 16,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -232,6 +251,7 @@ const styles = StyleSheet.create({
   },
   suggestionCard: {
     backgroundColor: CARD_BG,
+    marginHorizontal: 16,
     marginTop: 18,
     padding: 16,
     borderRadius: 4,
@@ -246,6 +266,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#222',
+  },
+  listHeading: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#222',
+    marginTop: 18,
+    marginHorizontal: 16,
+    marginBottom: 10,
+  },
+  listCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 10,
+    padding: 14,
+    borderRadius: 4,
+    elevation: 1,
+  },
+  listTaskTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222',
+  },
+  listTaskSub: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
   },
   bottomNav: {
     flexDirection: 'row',

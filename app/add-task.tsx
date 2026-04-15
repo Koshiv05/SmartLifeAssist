@@ -1,18 +1,53 @@
-import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { loadTasks, saveTasks } from '../services/storage';
 import { Task } from '../types/task';
 
 export default function AddTaskScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  function formatDate(date: Date) {
+    return date.toLocaleDateString('en-AU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }
+
+  function formatTime(date: Date) {
+    return date.toLocaleTimeString('en-AU', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  }
+
+  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
+    setShowDatePicker(false);
+    if (event.type === 'set' && selectedDate) {
+      setDueDate(formatDate(selectedDate));
+    }
+  }
+
+  function handleTimeChange(event: DateTimePickerEvent, selectedTime?: Date) {
+    setShowTimePicker(false);
+    if (event.type === 'set' && selectedTime) {
+      setDueTime(formatTime(selectedTime));
+    }
+  }
+
   async function handleSave() {
-    if (!title.trim() || !description.trim() || !dueTime.trim()) {
-      Alert.alert('Missing information', 'Please fill in all fields before saving.');
+    if (!title.trim() || !description.trim() || !dueDate.trim() || !dueTime.trim()) {
+      Alert.alert('Missing information', 'Please complete all fields before saving.');
       return;
     }
 
@@ -23,7 +58,8 @@ export default function AddTaskScreen() {
         id: Date.now().toString(),
         title: title.trim(),
         description: description.trim(),
-        dueTime: dueTime.trim(),
+        dueDate,
+        dueTime,
         reminderType: '',
       };
 
@@ -32,12 +68,13 @@ export default function AddTaskScreen() {
 
       setTitle('');
       setDescription('');
+      setDueDate('');
       setDueTime('');
 
       Alert.alert('Success', 'Task saved successfully.');
       router.back();
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong while saving the task.');
+      Alert.alert('Error', 'Could not save task.');
     }
   }
 
@@ -67,16 +104,33 @@ export default function AddTaskScreen() {
             onChangeText={setDescription}
           />
 
-          <View style={styles.timeWrapper}>
-            <Text style={styles.timeLabel}>Due Time</Text>
-            <TextInput
-              style={styles.timeInput}
-              placeholder="--:--"
-              placeholderTextColor="#333"
-              value={dueTime}
-              onChangeText={setDueTime}
+          <Pressable style={styles.pickerCard} onPress={() => setShowDatePicker(true)}>
+            <Text style={styles.pickerLabel}>Due Date</Text>
+            <Text style={styles.pickerValue}>{dueDate || 'Select date'}</Text>
+          </Pressable>
+
+          <Pressable style={styles.pickerCard} onPress={() => setShowTimePicker(true)}>
+            <Text style={styles.pickerLabel}>Due Time</Text>
+            <Text style={styles.pickerValue}>{dueTime || 'Select time'}</Text>
+          </Pressable>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={new Date()}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleDateChange}
             />
-          </View>
+          )}
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={new Date()}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleTimeChange}
+            />
+          )}
         </View>
 
         <View style={styles.bottomButtons}>
@@ -144,7 +198,7 @@ const styles = StyleSheet.create({
     height: 140,
     marginBottom: 14,
   },
-  timeWrapper: {
+  pickerCard: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#bdbdbd',
@@ -152,16 +206,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 10,
     paddingBottom: 14,
+    marginBottom: 14,
   },
-  timeLabel: {
+  pickerLabel: {
     fontSize: 13,
     color: '#555',
     marginBottom: 6,
   },
-  timeInput: {
+  pickerValue: {
     fontSize: 18,
     color: '#111',
-    paddingVertical: 4,
   },
   bottomButtons: {
     flexDirection: 'row',

@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scheduleBasicNotification, requestNotificationPermission } from '../services/notifications';
+import { requestNotificationPermission, scheduleBasicNotification } from '../services/notifications';
 
 export default function ReminderScreen() {
-  async function handleReminder() {
+  async function handleSaveReminder() {
     const granted = await requestNotificationPermission();
 
     if (!granted) {
@@ -13,11 +13,11 @@ export default function ReminderScreen() {
     }
 
     await scheduleBasicNotification(
-      'Task Reminder',
-      'Do not forget your upcoming SmartLife Assist task.'
+      'SmartLife Assist Reminder',
+      'Do not forget your scheduled task.'
     );
 
-    Alert.alert('Reminder set', 'A local notification has been scheduled.');
+    Alert.alert('Reminder set', 'Your reminder notification has been created.');
   }
 
   return (
@@ -28,9 +28,9 @@ export default function ReminderScreen() {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.sectionLabel}>Options</Text>
+          <Text style={styles.optionLabel}>Options</Text>
 
-          <Pressable style={styles.optionCard} onPress={handleReminder}>
+          <Pressable style={styles.optionCard}>
             <Text style={styles.optionText}>Time-based reminder</Text>
           </Pressable>
 
@@ -40,7 +40,7 @@ export default function ReminderScreen() {
         </View>
 
         <View style={styles.bottomButtons}>
-          <Pressable style={styles.saveButton} onPress={handleReminder}>
+          <Pressable style={styles.saveButton} onPress={handleSaveReminder}>
             <Text style={styles.buttonText}>SAVE</Text>
           </Pressable>
 
@@ -59,31 +59,17 @@ const RED = '#E53935';
 const LIGHT_BG = '#F2F2F2';
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
+  safeArea: { flex: 1, backgroundColor: LIGHT_BG },
+  container: { flex: 1, backgroundColor: LIGHT_BG },
   topBar: {
     width: '100%',
     backgroundColor: PURPLE,
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  topBarTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  sectionLabel: {
+  topBarTitle: { color: '#fff', fontSize: 18, fontWeight: '600' },
+  content: { flex: 1, padding: 16 },
+  optionLabel: {
     fontSize: 14,
     color: '#666',
     marginBottom: 12,

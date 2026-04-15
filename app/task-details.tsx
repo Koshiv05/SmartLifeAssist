@@ -3,9 +3,10 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TaskDetailsScreen() {
-  const { title, description, dueTime } = useLocalSearchParams<{
+  const { title, description, dueDate, dueTime } = useLocalSearchParams<{
     title: string;
     description: string;
+    dueDate: string;
     dueTime: string;
   }>();
 
@@ -24,14 +25,17 @@ export default function TaskDetailsScreen() {
             <Text style={styles.label}>Description</Text>
             <Text style={styles.value}>{description}</Text>
 
+            <Text style={styles.label}>Due Date</Text>
+            <Text style={styles.value}>{dueDate}</Text>
+
             <Text style={styles.label}>Due Time</Text>
             <Text style={styles.value}>{dueTime}</Text>
           </View>
         </View>
 
-        <View style={styles.bottomButtons}>
-          <Pressable style={styles.button} onPress={() => router.back()}>
-            <Text style={styles.buttonText}>BACK</Text>
+        <View style={styles.bottomArea}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backButtonText}>BACK</Text>
           </Pressable>
         </View>
       </View>
@@ -43,29 +47,16 @@ const PURPLE = '#9C27B0';
 const LIGHT_BG = '#F2F2F2';
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
+  safeArea: { flex: 1, backgroundColor: LIGHT_BG },
+  container: { flex: 1, backgroundColor: LIGHT_BG },
   topBar: {
     width: '100%',
     backgroundColor: PURPLE,
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  topBarTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
+  topBarTitle: { color: '#fff', fontSize: 18, fontWeight: '600' },
+  content: { flex: 1, padding: 16 },
   card: {
     backgroundColor: '#fff',
     borderRadius: 4,
@@ -82,15 +73,14 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#222',
   },
-  bottomButtons: {
+  bottomArea: {
     paddingHorizontal: 16,
     paddingTop: 14,
     paddingBottom: 12,
     borderTopWidth: 1,
     borderTopColor: '#d9d9d9',
-    backgroundColor: LIGHT_BG,
   },
-  button: {
+  backButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#999',
@@ -98,7 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 4,
   },
-  buttonText: {
+  backButtonText: {
     fontSize: 15,
     fontWeight: '700',
     color: '#222',
