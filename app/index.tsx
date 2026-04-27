@@ -71,7 +71,7 @@ export default function MainScreen() {
               <Text style={styles.middleButtonTextWhite}>SET REMINDER</Text>
             </Pressable>
 
-            <Pressable style={styles.aiButton}>
+            <Pressable style={styles.aiButton} onPress={() => router.push('/ai-suggestions' as any)}>
               <Text style={styles.middleButtonTextWhite}>AI SUGGESTIONS</Text>
             </Pressable>
 
@@ -114,7 +114,7 @@ export default function MainScreen() {
             <Text style={styles.bottomButtonTextWhite}>ADD TASK</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButtonRed}>
+          <Pressable style={styles.bottomButtonRed} onPress={() => router.push('/emergency' as any)}>
             <Text style={styles.bottomButtonTextWhite}>EMERGENCY</Text>
           </Pressable>
 
