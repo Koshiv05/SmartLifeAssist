@@ -10,6 +10,8 @@ export default function RootLayout() {
       <Stack.Screen name="task-details" options={{ headerShown: false }} />
       <Stack.Screen name="ai-suggestions" options={{ headerShown: false }} />
       <Stack.Screen name="emergency" options={{ headerShown: false }} />
+      <Stack.Screen name="contact-picker" options={{ headerShown: false }} />
+      <Stack.Screen name="location-settings" options={{ headerShown: false }} />
     </Stack>
   );
 }
