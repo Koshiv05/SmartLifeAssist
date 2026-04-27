@@ -8,6 +8,8 @@ export default function RootLayout() {
       <Stack.Screen name="settings" options={{ headerShown: false }} />
       <Stack.Screen name="reminder" options={{ headerShown: false }} />
       <Stack.Screen name="task-details" options={{ headerShown: false }} />
+      <Stack.Screen name="ai-suggestions" options={{ headerShown: false }} />
+      <Stack.Screen name="emergency" options={{ headerShown: false }} />
     </Stack>
   );
 }
