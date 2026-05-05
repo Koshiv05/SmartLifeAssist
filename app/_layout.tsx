@@ -12,6 +12,8 @@ export default function RootLayout() {
       <Stack.Screen name="emergency" options={{ headerShown: false }} />
       <Stack.Screen name="contact-picker" options={{ headerShown: false }} />
       <Stack.Screen name="location-settings" options={{ headerShown: false }} />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="signup" />
     </Stack>
   );
 }
