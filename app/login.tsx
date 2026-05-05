@@ -39,7 +39,7 @@ export default function LoginScreen() {
         <Text style={styles.text}>LOGIN</Text>
       </Pressable>
 
-      <Pressable onPress={() => router.push('/signup')}>
+      <Pressable onPress={() => router.push('/signup' as any)}>
         <Text style={styles.link}>Create Account</Text>
       </Pressable>
     </View>

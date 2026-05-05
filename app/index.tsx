@@ -9,7 +9,7 @@ export default function MainScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    router.replace('/login');
+    router.replace('/login' as any);
   }, []);
 
   useFocusEffect(
