@@ -1,16 +1,12 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { loadTasks } from '../services/storage';
 import { Task } from '../types/task';
 
 export default function MainScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
-
-  useEffect(() => {
-    router.replace('/login' as any);
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
