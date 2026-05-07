@@ -45,7 +45,10 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          <Pressable style={styles.locationButton}>
+          <Pressable
+            style={styles.locationButton}
+            onPress={() => router.push('/location-settings' as any)}
+          >
             <Text style={styles.locationButtonText}>LOCATION SETTINGS</Text>
           </Pressable>
         </View>

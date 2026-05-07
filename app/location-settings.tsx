@@ -51,18 +51,18 @@ export default function LocationSettingsScreen() {
           <Pressable style={styles.currentLocationButton} onPress={handleUseCurrentLocation}>
             <Text style={styles.currentLocationText}>USE CURRENT LOCATION</Text>
           </Pressable>
+          {currentLocation && (
+            <View style={styles.locationPreview}>
+              <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
+              <Text style={styles.locationPreviewText}>
+                Latitude: {currentLocation.latitude}
+              </Text>
+              <Text style={styles.locationPreviewText}>
+                Longitude: {currentLocation.longitude}
+              </Text>
+            </View>
+          )}
         </View>
-        {currentLocation && (
-          <View style={styles.locationPreview}>
-            <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
-            <Text style={styles.locationPreviewText}>
-              Latitude: {currentLocation.latitude}
-            </Text>
-            <Text style={styles.locationPreviewText}>
-              Longitude: {currentLocation.longitude}
-            </Text>
-          </View>
-        )}
 
         <View style={styles.bottomArea}>
           <Pressable style={styles.saveButton} onPress={() => router.back()}>
@@ -153,22 +153,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-locationPreview: {
-  backgroundColor: '#fff',
-  marginTop: 14,
-  padding: 14,
-  borderRadius: 4,
-  elevation: 2,
-},
-locationPreviewTitle: {
-  fontSize: 15,
-  fontWeight: '700',
-  color: '#222',
-  marginBottom: 8,
-},
-locationPreviewText: {
-  fontSize: 14,
-  color: '#444',
-  marginTop: 4,
-},
+  locationPreview: {
+    backgroundColor: '#fff',
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  locationPreviewTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 8,
+  },
+  locationPreviewText: {
+    fontSize: 14,
+    color: '#444',
+    marginTop: 4,
+  },
 });
