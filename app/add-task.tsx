@@ -5,6 +5,7 @@ import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { loadTasks, saveTasks } from '../services/storage';
 import { Task } from '../types/task';
+import { saveTaskToFirestore } from '../services/firestoreTasks';
 
 export default function AddTaskScreen() {
   const [title, setTitle] = useState('');
@@ -65,6 +66,7 @@ export default function AddTaskScreen() {
 
       const updatedTasks = [...existingTasks, newTask];
       await saveTasks(updatedTasks);
+      await saveTaskToFirestore(newTask);
 
       setTitle('');
       setDescription('');
