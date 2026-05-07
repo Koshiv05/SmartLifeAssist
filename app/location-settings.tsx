@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { getCurrentLocation, CurrentLocation } from '../services/locationService';
+import MapView, { Marker } from 'react-native-maps';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
@@ -10,6 +11,10 @@ export default function LocationSettingsScreen() {
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
 
   async function handleUseCurrentLocation() {
+    if (!locationEnabled) {
+      Alert.alert('Location disabled', 'Please enable location before using GPS.');
+      return;
+    }
     try {
       const location = await getCurrentLocation();
       setCurrentLocation(location);
@@ -48,7 +53,14 @@ export default function LocationSettingsScreen() {
             onChangeText={setLocationText}
           />
 
-          <Pressable style={styles.currentLocationButton} onPress={handleUseCurrentLocation}>
+          <Pressable
+            style={[
+              styles.currentLocationButton,
+              !locationEnabled && styles.disabledButton,
+            ]}
+            onPress={handleUseCurrentLocation}
+            disabled={!locationEnabled}
+          >
             <Text style={styles.currentLocationText}>USE CURRENT LOCATION</Text>
           </Pressable>
           {currentLocation && (
@@ -57,8 +69,27 @@ export default function LocationSettingsScreen() {
               <Text style={styles.locationPreviewText}>
                 {currentLocation.address}
               </Text>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: currentLocation.latitude,
+                    longitude: currentLocation.longitude,
+                  }}
+                  title="Current Location"
+                  description={currentLocation.address}
+                />
+              </MapView>
             </View>
           )}
+
         </View>
 
         <View style={styles.bottomArea}>
@@ -167,5 +198,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#444',
     marginTop: 4,
+  },
+  map: {
+    height: 180,
+    marginTop: 14,
+    borderRadius: 4,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
