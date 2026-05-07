@@ -64,9 +64,10 @@ export default function AddTaskScreen() {
         reminderType: '',
       };
 
+      await saveTaskToFirestore(newTask);
+
       const updatedTasks = [...existingTasks, newTask];
       await saveTasks(updatedTasks);
-      await saveTaskToFirestore(newTask);
 
       setTitle('');
       setDescription('');
@@ -75,8 +76,15 @@ export default function AddTaskScreen() {
 
       Alert.alert('Success', 'Task saved successfully.');
       router.back();
-    } catch (error) {
-      Alert.alert('Error', 'Could not save task.');
+    }
+
+    catch (error: any) {
+      console.log('Firestore save error:', error);
+
+      Alert.alert(
+        'Task not saved',
+        error?.message || 'Unknown Firebase error'
+      );
     }
   }
 

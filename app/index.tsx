@@ -1,13 +1,30 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useState } from 'react';
 import { loadTasks } from '../services/storage';
 import { Task } from '../types/task';
 import { loadTasksFromFirestore } from '../services/firestoreTasks';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 export default function MainScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          router.replace('/login' as any);
+        } else {
+          setUserEmail(user.email);
+        }
+      });
+
+      return unsubscribe;
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -46,6 +63,15 @@ export default function MainScreen() {
     });
   }
 
+  async function handleLogout() {
+    try {
+      await signOut(auth);
+      router.replace('/login' as any);
+    } catch (error) {
+      Alert.alert('Error', 'Could not log out.');
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.container}>
@@ -55,6 +81,15 @@ export default function MainScreen() {
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.screenLabel}>Main Activity</Text>
+          <View style={styles.userBar}>
+            <Text style={styles.userText}>
+              Logged in as: {userEmail || 'Checking...'}
+            </Text>
+
+            <Pressable style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutText}>LOGOUT</Text>
+            </Pressable>
+          </View>
 
           <View style={styles.taskCard}>
             {latestTask ? (
@@ -348,4 +383,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
+
+
+userBar: {
+  backgroundColor: '#fff',
+  marginHorizontal: 16,
+  marginBottom: 12,
+  padding: 12,
+  borderRadius: 4,
+  elevation: 1,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+userText: {
+  fontSize: 13,
+  color: '#444',
+  flex: 1,
+},
+logoutButton: {
+  backgroundColor: '#E53935',
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 4,
+},
+logoutText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '700',
+},
+
 });
