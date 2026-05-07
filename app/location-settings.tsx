@@ -13,7 +13,7 @@ export default function LocationSettingsScreen() {
     try {
       const location = await getCurrentLocation();
       setCurrentLocation(location);
-      setLocationText(`${location.latitude}, ${location.longitude}`);
+      setLocationText(location.address);
       Alert.alert('Location found', 'Current location has been added.');
     } catch (error: any) {
       Alert.alert('Location error', error.message || 'Could not get current location.');
@@ -55,10 +55,7 @@ export default function LocationSettingsScreen() {
             <View style={styles.locationPreview}>
               <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
               <Text style={styles.locationPreviewText}>
-                Latitude: {currentLocation.latitude}
-              </Text>
-              <Text style={styles.locationPreviewText}>
-                Longitude: {currentLocation.longitude}
+                {currentLocation.address}
               </Text>
             </View>
           )}
