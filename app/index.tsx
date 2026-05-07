@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useState } from 'react';
 import { loadTasks } from '../services/storage';
 import { Task } from '../types/task';
+import { loadTasksFromFirestore } from '../services/firestoreTasks';
 
 export default function MainScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -11,8 +12,19 @@ export default function MainScreen() {
   useFocusEffect(
     useCallback(() => {
       async function fetchTasks() {
-        const savedTasks = await loadTasks();
-        setTasks(savedTasks);
+        try {
+          const firestoreTasks = await loadTasksFromFirestore();
+
+          if (firestoreTasks.length > 0) {
+            setTasks(firestoreTasks);
+          } else {
+            const localTasks = await loadTasks();
+            setTasks(localTasks);
+          }
+        } catch (error) {
+          const localTasks = await loadTasks();
+          setTasks(localTasks);
+        }
       }
 
       fetchTasks();
