@@ -1,11 +1,24 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import { getCurrentLocation, CurrentLocation } from '../services/locationService';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [locationText, setLocationText] = useState('');
+  const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
+
+  async function handleUseCurrentLocation() {
+    try {
+      const location = await getCurrentLocation();
+      setCurrentLocation(location);
+      setLocationText(`${location.latitude}, ${location.longitude}`);
+      Alert.alert('Location found', 'Current location has been added.');
+    } catch (error: any) {
+      Alert.alert('Location error', error.message || 'Could not get current location.');
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -35,10 +48,21 @@ export default function LocationSettingsScreen() {
             onChangeText={setLocationText}
           />
 
-          <Pressable style={styles.currentLocationButton}>
+          <Pressable style={styles.currentLocationButton} onPress={handleUseCurrentLocation}>
             <Text style={styles.currentLocationText}>USE CURRENT LOCATION</Text>
           </Pressable>
         </View>
+        {currentLocation && (
+          <View style={styles.locationPreview}>
+            <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
+            <Text style={styles.locationPreviewText}>
+              Latitude: {currentLocation.latitude}
+            </Text>
+            <Text style={styles.locationPreviewText}>
+              Longitude: {currentLocation.longitude}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.bottomArea}>
           <Pressable style={styles.saveButton} onPress={() => router.back()}>
@@ -129,4 +153,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+locationPreview: {
+  backgroundColor: '#fff',
+  marginTop: 14,
+  padding: 14,
+  borderRadius: 4,
+  elevation: 2,
+},
+locationPreviewTitle: {
+  fontSize: 15,
+  fontWeight: '700',
+  color: '#222',
+  marginBottom: 8,
+},
+locationPreviewText: {
+  fontSize: 14,
+  color: '#444',
+  marginTop: 4,
+},
 });
