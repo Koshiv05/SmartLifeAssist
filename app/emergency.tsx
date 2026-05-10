@@ -1,9 +1,8 @@
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, ScrollView, Share } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { CurrentLocation, getCurrentLocation } from '../services/locationService';
-import { Share } from 'react-native';
 import { loadEmergencyContacts } from '../services/contactStorage';
 import { EmergencyContact } from '../types/contact';
 
@@ -18,14 +17,8 @@ export default function EmergencyScreen() {
       setIsLoadingLocation(true);
 
       const location = await getCurrentLocation();
-
       const contacts = await loadEmergencyContacts();
-
       const enabledContacts = contacts.filter((contact) => contact.selected);
-
-      setSelectedContacts(enabledContacts);
-
-      setEmergencyLocation(location);
 
       const message =
         `EMERGENCY ALERT\n\n` +
@@ -33,6 +26,8 @@ export default function EmergencyScreen() {
         `Current Location:\n${location.address}\n\n` +
         `Please contact me as soon as possible.`;
 
+      setEmergencyLocation(location);
+      setSelectedContacts(enabledContacts);
       setPreparedMessage(message);
 
       Alert.alert(
@@ -49,6 +44,17 @@ export default function EmergencyScreen() {
     }
   }
 
+  async function handleShareAlert() {
+    if (!preparedMessage) {
+      Alert.alert('No alert prepared', 'Please press Send Alert first.');
+      return;
+    }
+
+    await Share.share({
+      message: preparedMessage,
+    });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -56,7 +62,11 @@ export default function EmergencyScreen() {
           <Text style={styles.topBarTitle}>Emergency</Text>
         </View>
 
-        <View style={styles.content}>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Pressable style={styles.alertCard} onPress={handleAlert}>
             <Text style={styles.alertIcon}>!</Text>
             <Text style={styles.alertText}>
@@ -93,14 +103,9 @@ export default function EmergencyScreen() {
             <View style={styles.messageCard}>
               <Text style={styles.messageTitle}>Prepared Emergency Message</Text>
 
-              <Text style={styles.messageText}>
-                {preparedMessage}
-              </Text>
+              <Text style={styles.messageText}>{preparedMessage}</Text>
 
-              <Pressable
-                style={styles.shareButton}
-                onPress={() => Share.share({ message: preparedMessage })}
-              >
+              <Pressable style={styles.shareButton} onPress={handleShareAlert}>
                 <Text style={styles.shareButtonText}>SHARE ALERT</Text>
               </Pressable>
             </View>
@@ -112,7 +117,7 @@ export default function EmergencyScreen() {
           >
             <Text style={styles.manageButtonText}>MANAGE EMERGENCY CONTACTS</Text>
           </Pressable>
-        </View>
+        </ScrollView>
 
         <View style={styles.bottomButtons}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -128,16 +133,33 @@ const RED = '#FF4438';
 const LIGHT_BG = '#F2F2F2';
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: LIGHT_BG },
-  container: { flex: 1, backgroundColor: LIGHT_BG },
+  safeArea: {
+    flex: 1,
+    backgroundColor: LIGHT_BG,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: LIGHT_BG,
+  },
   topBarRed: {
     width: '100%',
     backgroundColor: RED,
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  topBarTitle: { color: '#fff', fontSize: 18, fontWeight: '600' },
-  content: { flex: 1, padding: 16 },
+  topBarTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
   alertCard: {
     backgroundColor: RED,
     borderRadius: 4,
@@ -159,7 +181,6 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     backgroundColor: '#fff',
-    marginTop: 0,
     padding: 16,
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
@@ -188,6 +209,54 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#444',
     lineHeight: 22,
+  },
+  contactsCard: {
+    backgroundColor: '#fff',
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  contactsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 10,
+  },
+  contactItem: {
+    fontSize: 14,
+    color: '#444',
+    marginTop: 6,
+  },
+  messageCard: {
+    backgroundColor: '#fff',
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  messageTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 10,
+  },
+  messageText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 22,
+  },
+  shareButton: {
+    marginTop: 16,
+    backgroundColor: '#1976D2',
+    paddingVertical: 14,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  shareButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
   },
   manageButton: {
     marginTop: 20,
@@ -223,53 +292,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-
-contactsCard: {
-  backgroundColor: '#fff',
-  marginTop: 16,
-  padding: 16,
-  borderRadius: 4,
-  elevation: 2,
-},
-contactsTitle: {
-  fontSize: 16,
-  fontWeight: '700',
-  color: '#222',
-  marginBottom: 10,
-},
-contactItem: {
-  fontSize: 14,
-  color: '#444',
-  marginTop: 6,
-},
-messageCard: {
-  backgroundColor: '#fff',
-  marginTop: 16,
-  padding: 16,
-  borderRadius: 4,
-  elevation: 2,
-},
-messageTitle: {
-  fontSize: 16,
-  fontWeight: '700',
-  color: '#222',
-  marginBottom: 10,
-},
-messageText: {
-  fontSize: 14,
-  color: '#333',
-  lineHeight: 22,
-},
-shareButton: {
-  marginTop: 16,
-  backgroundColor: '#1976D2',
-  paddingVertical: 14,
-  borderRadius: 4,
-  alignItems: 'center',
-},
-shareButtonText: {
-  color: '#fff',
-  fontSize: 14,
-  fontWeight: '700',
-},
 });
