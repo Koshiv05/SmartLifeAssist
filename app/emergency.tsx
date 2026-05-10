@@ -1,10 +1,32 @@
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { CurrentLocation, getCurrentLocation } from '../services/locationService';
 
 export default function EmergencyScreen() {
-  function handleAlert() {
-    Alert.alert('Emergency Alert', 'Emergency alert action triggered.');
+  const [emergencyLocation, setEmergencyLocation] = useState<CurrentLocation | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+
+  async function handleAlert() {
+    try {
+      setIsLoadingLocation(true);
+
+      const location = await getCurrentLocation();
+      setEmergencyLocation(location);
+
+      Alert.alert(
+        'Emergency Alert Ready',
+        `Emergency alert prepared with your current location:\n\n${location.address}`
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Location Error',
+        error.message || 'Could not get current location for emergency alert.'
+      );
+    } finally {
+      setIsLoadingLocation(false);
+    }
   }
 
   return (
@@ -17,14 +39,23 @@ export default function EmergencyScreen() {
         <View style={styles.content}>
           <Pressable style={styles.alertCard} onPress={handleAlert}>
             <Text style={styles.alertIcon}>!</Text>
-            <Text style={styles.alertText}>SEND ALERT</Text>
+            <Text style={styles.alertText}>
+              {isLoadingLocation ? 'GETTING LOCATION...' : 'SEND ALERT'}
+            </Text>
           </Pressable>
 
           <View style={styles.infoCard}>
             <Text style={styles.infoText}>
-              Your location will be shared with selected contacts
+              Your current location will be prepared for sharing with selected contacts.
             </Text>
           </View>
+
+          {emergencyLocation && (
+            <View style={styles.locationCard}>
+              <Text style={styles.locationTitle}>Emergency Location</Text>
+              <Text style={styles.locationText}>{emergencyLocation.address}</Text>
+            </View>
+          )}
 
           <Pressable
             style={styles.manageButton}
@@ -89,6 +120,24 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#222',
     textAlign: 'center',
+    lineHeight: 22,
+  },
+  locationCard: {
+    backgroundColor: '#fff',
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  locationTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 8,
+  },
+  locationText: {
+    fontSize: 15,
+    color: '#444',
     lineHeight: 22,
   },
   manageButton: {

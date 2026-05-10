@@ -1,20 +1,23 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { getCurrentLocation, CurrentLocation } from '../services/locationService';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [locationText, setLocationText] = useState('');
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
 
+  const selectedLocation = currentLocation;
+
   async function handleUseCurrentLocation() {
     if (!locationEnabled) {
       Alert.alert('Location disabled', 'Please enable location before using GPS.');
       return;
     }
+
     try {
       const location = await getCurrentLocation();
       setCurrentLocation(location);
@@ -41,6 +44,7 @@ export default function LocationSettingsScreen() {
                   {locationEnabled ? 'Location services are enabled' : 'Location services are disabled'}
                 </Text>
               </View>
+
               <Switch value={locationEnabled} onValueChange={setLocationEnabled} />
             </View>
           </View>
@@ -63,33 +67,41 @@ export default function LocationSettingsScreen() {
           >
             <Text style={styles.currentLocationText}>USE CURRENT LOCATION</Text>
           </Pressable>
-          {currentLocation && (
+
+          {selectedLocation && (
             <View style={styles.locationPreview}>
               <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
+
               <Text style={styles.locationPreviewText}>
-                {currentLocation.address}
+                {selectedLocation.address}
               </Text>
+
               <MapView
                 style={styles.map}
+                mapType={Platform.OS === 'android' ? 'none' : 'standard'}
                 initialRegion={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
+                  latitude: selectedLocation.latitude,
+                  longitude: selectedLocation.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
               >
+                <UrlTile
+                  urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  maximumZ={19}
+                />
+
                 <Marker
                   coordinate={{
-                    latitude: currentLocation.latitude,
-                    longitude: currentLocation.longitude,
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
                   }}
                   title="Current Location"
-                  description={currentLocation.address}
+                  description={selectedLocation.address}
                 />
               </MapView>
             </View>
           )}
-
         </View>
 
         <View style={styles.bottomArea}>
@@ -163,23 +175,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  bottomArea: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#d9d9d9',
-  },
-  saveButton: {
-    backgroundColor: GREEN,
-    paddingVertical: 16,
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
+  disabledButton: {
+    opacity: 0.5,
   },
   locationPreview: {
     backgroundColor: '#fff',
@@ -200,11 +197,27 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   map: {
-    height: 180,
+    height: 220,
     marginTop: 14,
     borderRadius: 4,
+    overflow: 'hidden',
   },
-  disabledButton: {
-    opacity: 0.5,
+  bottomArea: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#d9d9d9',
+  },
+  saveButton: {
+    backgroundColor: GREEN,
+    paddingVertical: 16,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
