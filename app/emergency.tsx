@@ -3,26 +3,46 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { CurrentLocation, getCurrentLocation } from '../services/locationService';
+import { Share } from 'react-native';
+import { loadEmergencyContacts } from '../services/contactStorage';
+import { EmergencyContact } from '../types/contact';
 
 export default function EmergencyScreen() {
   const [emergencyLocation, setEmergencyLocation] = useState<CurrentLocation | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [selectedContacts, setSelectedContacts] = useState<EmergencyContact[]>([]);
+  const [preparedMessage, setPreparedMessage] = useState('');
 
   async function handleAlert() {
     try {
       setIsLoadingLocation(true);
 
       const location = await getCurrentLocation();
+
+      const contacts = await loadEmergencyContacts();
+
+      const enabledContacts = contacts.filter((contact) => contact.selected);
+
+      setSelectedContacts(enabledContacts);
+
       setEmergencyLocation(location);
 
+      const message =
+        `EMERGENCY ALERT\n\n` +
+        `I need emergency assistance.\n\n` +
+        `Current Location:\n${location.address}\n\n` +
+        `Please contact me as soon as possible.`;
+
+      setPreparedMessage(message);
+
       Alert.alert(
-        'Emergency Alert Ready',
-        `Emergency alert prepared with your current location:\n\n${location.address}`
+        'Emergency Alert Prepared',
+        `Emergency alert prepared for ${enabledContacts.length} selected contact(s).`
       );
     } catch (error: any) {
       Alert.alert(
         'Location Error',
-        error.message || 'Could not get current location for emergency alert.'
+        error.message || 'Could not prepare emergency alert.'
       );
     } finally {
       setIsLoadingLocation(false);
@@ -56,6 +76,35 @@ export default function EmergencyScreen() {
               <Text style={styles.locationText}>{emergencyLocation.address}</Text>
             </View>
           )}
+
+          {selectedContacts.length > 0 && (
+            <View style={styles.contactsCard}>
+              <Text style={styles.contactsTitle}>Selected Emergency Contacts</Text>
+
+              {selectedContacts.map((contact) => (
+                <Text key={contact.id} style={styles.contactItem}>
+                  • {contact.name} ({contact.phone})
+                </Text>
+              ))}
+            </View>
+          )}
+
+          {preparedMessage ? (
+            <View style={styles.messageCard}>
+              <Text style={styles.messageTitle}>Prepared Emergency Message</Text>
+
+              <Text style={styles.messageText}>
+                {preparedMessage}
+              </Text>
+
+              <Pressable
+                style={styles.shareButton}
+                onPress={() => Share.share({ message: preparedMessage })}
+              >
+                <Text style={styles.shareButtonText}>SHARE ALERT</Text>
+              </Pressable>
+            </View>
+          ) : null}
 
           <Pressable
             style={styles.manageButton}
@@ -174,4 +223,53 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
+
+contactsCard: {
+  backgroundColor: '#fff',
+  marginTop: 16,
+  padding: 16,
+  borderRadius: 4,
+  elevation: 2,
+},
+contactsTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#222',
+  marginBottom: 10,
+},
+contactItem: {
+  fontSize: 14,
+  color: '#444',
+  marginTop: 6,
+},
+messageCard: {
+  backgroundColor: '#fff',
+  marginTop: 16,
+  padding: 16,
+  borderRadius: 4,
+  elevation: 2,
+},
+messageTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#222',
+  marginBottom: 10,
+},
+messageText: {
+  fontSize: 14,
+  color: '#333',
+  lineHeight: 22,
+},
+shareButton: {
+  marginTop: 16,
+  backgroundColor: '#1976D2',
+  paddingVertical: 14,
+  borderRadius: 4,
+  alignItems: 'center',
+},
+shareButtonText: {
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: '700',
+},
 });
