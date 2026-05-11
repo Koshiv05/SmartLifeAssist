@@ -1,52 +1,11 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCallback, useState } from 'react';
-import { loadTasks } from '../services/storage';
 import { Task } from '../types/task';
-import { loadTasksFromFirestore } from '../services/firestoreTasks';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { useAppContext } from '../contexts/AppContext';
 
 export default function MainScreen() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.replace('/login' as any);
-        } else {
-          setUserEmail(user.email);
-        }
-      });
-
-      return unsubscribe;
-    }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      async function fetchTasks() {
-        try {
-          const firestoreTasks = await loadTasksFromFirestore();
-
-          if (firestoreTasks.length > 0) {
-            setTasks(firestoreTasks);
-          } else {
-            const localTasks = await loadTasks();
-            setTasks(localTasks);
-          }
-        } catch (error) {
-          const localTasks = await loadTasks();
-          setTasks(localTasks);
-        }
-      }
-
-      fetchTasks();
-    }, [])
-  );
+  const { user, tasks, darkMode, largeText } = useAppContext();
 
   const latestTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
 
@@ -63,35 +22,27 @@ export default function MainScreen() {
     });
   }
 
-  async function handleLogout() {
-    try {
-      await signOut(auth);
-      router.replace('/login' as any);
-    } catch (error) {
-      Alert.alert('Error', 'Could not log out.');
-    }
-  }
+  const pageBackground = darkMode ? '#121212' : LIGHT_BG;
+  const cardBackground = darkMode ? '#1E1E1E' : '#fff';
+  const primaryText = darkMode ? '#fff' : '#222';
+  const secondaryText = darkMode ? '#ccc' : '#666';
+  const bodyFontSize = largeText ? 18 : 16;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
-      <View style={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: pageBackground }]} edges={['top', 'left', 'right', 'bottom']}>
+      <View style={[styles.container, { backgroundColor: pageBackground }]}>
         <View style={styles.topBar}>
           <Text style={styles.topBarTitle}>SmartLife Assist</Text>
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.screenLabel}>Main Activity</Text>
-          <View style={styles.userBar}>
-            <Text style={styles.userText}>
-              Logged in as: {userEmail || 'Checking...'}
+          <View style={[styles.userBar, { backgroundColor: cardBackground }]}>
+            <Text style={[styles.userText, { color: secondaryText, fontSize: largeText ? 15 : 13 }]}>
+              Logged in as: {user?.email || 'Checking...'}
             </Text>
-
-            <Pressable style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutText}>LOGOUT</Text>
-            </Pressable>
           </View>
 
-          <View style={styles.taskCard}>
+          <View style={[styles.taskCard, { backgroundColor: cardBackground }]}>
             {latestTask ? (
               <View style={styles.taskRow}>
                 <View style={styles.checkCircle}>
@@ -99,16 +50,20 @@ export default function MainScreen() {
                 </View>
 
                 <View style={styles.taskTextContainer}>
-                  <Text style={styles.taskLabel}>Latest Task</Text>
-                  <Text style={styles.taskTime}>{latestTask.dueTime}</Text>
-                  <Text style={styles.taskTitle}>{latestTask.title}</Text>
-                  <Text style={styles.taskDate}>{latestTask.dueDate}</Text>
+                  <Text style={[styles.taskLabel, { color: secondaryText }]}>Latest Task</Text>
+                  <Text style={[styles.taskTime, { color: primaryText }]}>{latestTask.dueTime}</Text>
+                  <Text style={[styles.taskTitle, { color: primaryText, fontSize: largeText ? 18 : 16 }]}>
+                    {latestTask.title}
+                  </Text>
+                  <Text style={[styles.taskDate, { color: secondaryText }]}>{latestTask.dueDate}</Text>
                 </View>
               </View>
             ) : (
               <View>
-                <Text style={styles.taskLabel}>Latest Task</Text>
-                <Text style={styles.emptyState}>No tasks added yet.</Text>
+                <Text style={[styles.taskLabel, { color: secondaryText }]}>Latest Task</Text>
+                <Text style={[styles.emptyState, { color: primaryText, fontSize: bodyFontSize }]}>
+                  No tasks added yet.
+                </Text>
               </View>
             )}
           </View>
@@ -119,7 +74,7 @@ export default function MainScreen() {
             </Pressable>
 
             <Pressable style={styles.aiButton} onPress={() => router.push('/ai-suggestions' as any)}>
-              <Text style={styles.middleButtonTextWhite}>AI SUGGESTIONS</Text>
+              <Text style={styles.middleButtonTextWhite}>SMART SUGGESTIONS</Text>
             </Pressable>
 
             <Pressable
@@ -130,25 +85,32 @@ export default function MainScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.suggestionCard}>
-            <Text style={styles.suggestionTitle}>AI Suggestion</Text>
-            <Text style={styles.suggestionText}>
-              Based on your schedule, consider starting the project report now to avoid
-              last-minute rush.
+          <View style={[styles.suggestionCard, { backgroundColor: darkMode ? '#2A1F2D' : CARD_BG }]}>
+            <Text style={[styles.suggestionTitle, { color: secondaryText }]}>Smart Suggestion</Text>
+            <Text style={[styles.suggestionText, { color: primaryText, fontSize: bodyFontSize }]}>
+              Based on your saved tasks, use Smart Suggestions to receive context-aware productivity guidance.
             </Text>
           </View>
 
-          <Text style={styles.listHeading}>Saved Tasks</Text>
+          <Text style={[styles.listHeading, { color: primaryText }]}>Saved Tasks</Text>
 
           {tasks.length === 0 ? (
-            <View style={styles.listCard}>
-              <Text style={styles.emptyState}>No saved tasks available.</Text>
+            <View style={[styles.listCard, { backgroundColor: cardBackground }]}>
+              <Text style={[styles.emptyState, { color: primaryText, fontSize: bodyFontSize }]}>
+                No saved tasks available.
+              </Text>
             </View>
           ) : (
             tasks.map((task) => (
-              <Pressable key={task.id} style={styles.listCard} onPress={() => openTaskDetails(task)}>
-                <Text style={styles.listTaskTitle}>{task.title}</Text>
-                <Text style={styles.listTaskSub}>
+              <Pressable
+                key={task.id}
+                style={[styles.listCard, { backgroundColor: cardBackground }]}
+                onPress={() => openTaskDetails(task)}
+              >
+                <Text style={[styles.listTaskTitle, { color: primaryText, fontSize: bodyFontSize }]}>
+                  {task.title}
+                </Text>
+                <Text style={[styles.listTaskSub, { color: secondaryText }]}>
                   {task.dueDate} • {task.dueTime}
                 </Text>
               </Pressable>
@@ -156,8 +118,8 @@ export default function MainScreen() {
           )}
         </ScrollView>
 
-        <View style={styles.bottomNav}>
-          <Pressable style={styles.bottomButtonGreen} onPress={() => router.push('/add-task')}>
+        <View style={[styles.bottomNav, { backgroundColor: pageBackground }]}>
+          <Pressable style={styles.bottomButtonGreen} onPress={() => router.push('/add-task' as any)}>
             <Text style={styles.bottomButtonTextWhite}>ADD TASK</Text>
           </Pressable>
 
@@ -165,7 +127,7 @@ export default function MainScreen() {
             <Text style={styles.bottomButtonTextWhite}>EMERGENCY</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomButtonOutline} onPress={() => router.push('/settings')}>
+          <Pressable style={styles.bottomButtonOutline} onPress={() => router.push('/settings' as any)}>
             <Text style={styles.bottomButtonTextBlue}>SETTINGS</Text>
           </Pressable>
         </View>
@@ -192,6 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: LIGHT_BG,
   },
   scrollContent: {
+    paddingTop: 12,
     paddingBottom: 20,
   },
   topBar: {
@@ -205,12 +168,17 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
   },
-  screenLabel: {
-    textAlign: 'center',
-    color: '#666',
+  userBar: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 4,
+    elevation: 1,
+  },
+  userText: {
     fontSize: 13,
-    marginTop: 12,
-    marginBottom: 10,
+    color: '#444',
   },
   taskCard: {
     backgroundColor: '#fff',
@@ -383,34 +351,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-
-
-userBar: {
-  backgroundColor: '#fff',
-  marginHorizontal: 16,
-  marginBottom: 12,
-  padding: 12,
-  borderRadius: 4,
-  elevation: 1,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-},
-userText: {
-  fontSize: 13,
-  color: '#444',
-  flex: 1,
-},
-logoutButton: {
-  backgroundColor: '#E53935',
-  paddingVertical: 8,
-  paddingHorizontal: 12,
-  borderRadius: 4,
-},
-logoutText: {
-  color: '#fff',
-  fontSize: 12,
-  fontWeight: '700',
-},
-
 });
