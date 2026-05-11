@@ -7,20 +7,14 @@ type FirestoreTask = Task & {
     createdAtMs: number;
 };
 
-export async function saveTaskToFirestore(task: Task) {
-    const user = auth.currentUser;
+export async function saveTaskToFirestore(task: Task, userId: string) {
+  const taskData: FirestoreTask = {
+    ...task,
+    userId,
+    createdAtMs: Date.now(),
+  };
 
-    if (!user) {
-        throw new Error('User is not logged in.');
-    }
-
-    const taskData: FirestoreTask = {
-        ...task,
-        userId: user.uid,
-        createdAtMs: Date.now(),
-    };
-
-    await addDoc(collection(db, 'tasks'), taskData);
+  await addDoc(collection(db, 'tasks'), taskData);
 }
 
 export async function loadTasksFromFirestore(): Promise<Task[]> {

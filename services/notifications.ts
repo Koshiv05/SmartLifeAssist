@@ -27,12 +27,6 @@ export async function requestNotificationPermission() {
   return true;
 }
 
-export async function scheduleBasicNotification(title: string, body: string) {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-    },
-    trigger: null,
-  });
+export async function scheduleTaskNotification() {
+  console.log('Notifications temporarily disabled in Expo Go');
 }

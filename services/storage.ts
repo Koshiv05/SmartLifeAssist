@@ -21,3 +21,30 @@ export async function loadTasks(): Promise<Task[]> {
     return [];
   }
 }
+
+const USER_SESSION_KEY = 'smartlife_user_session';
+
+export async function saveUserSession(email: string) {
+  try {
+    await AsyncStorage.setItem(USER_SESSION_KEY, email);
+  } catch (error) {
+    console.error('Error saving user session:', error);
+  }
+}
+
+export async function loadUserSession(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(USER_SESSION_KEY);
+  } catch (error) {
+    console.error('Error loading user session:', error);
+    return null;
+  }
+}
+
+export async function clearUserSession() {
+  try {
+    await AsyncStorage.removeItem(USER_SESSION_KEY);
+  } catch (error) {
+    console.error('Error clearing user session:', error);
+  }
+}

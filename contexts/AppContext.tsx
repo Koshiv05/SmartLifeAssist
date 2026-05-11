@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { Task } from '../types/task';
@@ -9,7 +9,6 @@ type AppContextType = {
   tasks: Task[];
   darkMode: boolean;
   largeText: boolean;
-
   refreshTasks: () => Promise<void>;
   setDarkMode: (value: boolean) => void;
   setLargeText: (value: boolean) => void;
@@ -23,12 +22,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [largeText, setLargeText] = useState(false);
 
+  async function refreshTasks() {
+    try {
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        setTasks([]);
+        return;
+      }
+
+      const firestoreTasks = await loadTasksFromFirestore(currentUser.uid);
+      setTasks(firestoreTasks);
+    } catch (error) {
+      console.log('Task refresh failed:', error);
+    }
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 
       if (firebaseUser) {
-        await refreshTasks();
+        const firestoreTasks = await loadTasksFromFirestore(firebaseUser.uid);
+        setTasks(firestoreTasks);
       } else {
         setTasks([]);
       }
@@ -36,15 +52,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return unsubscribe;
   }, []);
-
-  async function refreshTasks() {
-    try {
-      const firestoreTasks = await loadTasksFromFirestore();
-      setTasks(firestoreTasks);
-    } catch (error) {
-      console.log('Task refresh failed:', error);
-    }
-  }
 
   return (
     <AppContext.Provider
