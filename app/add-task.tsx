@@ -3,16 +3,16 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { loadTasks, saveTasks } from '../services/storage';
 import { Task } from '../types/task';
 import { saveTaskToFirestore } from '../services/firestoreTasks';
+import { useAppContext } from '../contexts/AppContext';
 
 export default function AddTaskScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
-
+  const { refreshTasks } = useAppContext();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -53,8 +53,6 @@ export default function AddTaskScreen() {
     }
 
     try {
-      const existingTasks = await loadTasks();
-
       const newTask: Task = {
         id: Date.now().toString(),
         title: title.trim(),
@@ -65,9 +63,7 @@ export default function AddTaskScreen() {
       };
 
       await saveTaskToFirestore(newTask);
-
-      const updatedTasks = [...existingTasks, newTask];
-      await saveTasks(updatedTasks);
+      await refreshTasks();
 
       setTitle('');
       setDescription('');
