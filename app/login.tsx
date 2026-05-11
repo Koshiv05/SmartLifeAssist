@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { router } from 'expo-router';
+import { saveUserSession } from '../services/storage';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -12,7 +13,8 @@ export default function LoginScreen() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert('Success', 'Logged in successfully');
-      router.replace('/');
+      await saveUserSession(email.trim());
+      router.replace('/' as any);
     } catch (error: any) {
       Alert.alert('Error', error.message);
     }

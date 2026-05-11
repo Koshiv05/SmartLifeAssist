@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { router } from 'expo-router';
+import { saveUserSession } from '../services/storage';
 
 export default function SignupScreen() {
   const [email, setEmail] = useState('');
@@ -12,7 +13,8 @@ export default function SignupScreen() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       Alert.alert('Success', 'Account created');
-      router.replace('/');
+      await saveUserSession(email.trim());
+      router.replace('/' as any);
     } catch (error: any) {
       Alert.alert('Error', error.message);
     }

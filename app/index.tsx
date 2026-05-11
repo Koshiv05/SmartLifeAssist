@@ -1,11 +1,33 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
 import { Task } from '../types/task';
 import { useAppContext } from '../contexts/AppContext';
+import { loadUserSession } from '../services/storage';
 
 export default function MainScreen() {
   const { user, tasks, darkMode, largeText } = useAppContext();
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    async function checkSession() {
+      const savedSession = await loadUserSession();
+
+      if (!savedSession) {
+        router.replace('/login' as any);
+        return;
+      }
+
+      setCheckingSession(false);
+    }
+
+    checkSession();
+  }, []);
+
+  if (checkingSession) {
+    return null;
+  }
 
   const latestTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
 
@@ -38,7 +60,7 @@ export default function MainScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={[styles.userBar, { backgroundColor: cardBackground }]}>
             <Text style={[styles.userText, { color: secondaryText, fontSize: largeText ? 15 : 13 }]}>
-              Logged in as: {user?.email || 'Checking...'}
+              Logged in as: {user?.email || 'Saved session active'}
             </Text>
           </View>
 
@@ -145,29 +167,16 @@ const CARD_BG = '#F4EAF5';
 const BLUE = '#1976D2';
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: LIGHT_BG,
-  },
-  scrollContent: {
-    paddingTop: 12,
-    paddingBottom: 20,
-  },
+  safeArea: { flex: 1, backgroundColor: LIGHT_BG },
+  container: { flex: 1, backgroundColor: LIGHT_BG },
+  scrollContent: { paddingTop: 12, paddingBottom: 20 },
   topBar: {
     width: '100%',
     backgroundColor: PURPLE,
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  topBarTitle: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-  },
+  topBarTitle: { color: '#fff', fontSize: 17, fontWeight: '600' },
   userBar: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
@@ -176,10 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     elevation: 1,
   },
-  userText: {
-    fontSize: 13,
-    color: '#444',
-  },
+  userText: { fontSize: 13, color: '#444' },
   taskCard: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
@@ -187,10 +193,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     elevation: 2,
   },
-  taskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  taskRow: { flexDirection: 'row', alignItems: 'center' },
   checkCircle: {
     width: 54,
     height: 54,
@@ -200,39 +203,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 16,
   },
-  checkMark: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  taskTextContainer: {
-    flex: 1,
-  },
-  taskLabel: {
-    fontSize: 14,
-    color: '#777',
-    marginBottom: 4,
-  },
-  taskTime: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#111',
-  },
-  taskTitle: {
-    fontSize: 16,
-    color: '#222',
-    marginTop: 4,
-  },
-  taskDate: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
-  emptyState: {
-    fontSize: 16,
-    color: '#444',
-    marginTop: 6,
-  },
+  checkMark: { color: '#fff', fontSize: 28, fontWeight: '700' },
+  taskTextContainer: { flex: 1 },
+  taskLabel: { fontSize: 14, color: '#777', marginBottom: 4 },
+  taskTime: { fontSize: 30, fontWeight: '700', color: '#111' },
+  taskTitle: { fontSize: 16, color: '#222', marginTop: 4 },
+  taskDate: { fontSize: 14, color: '#666', marginTop: 4 },
+  emptyState: { fontSize: 16, color: '#444', marginTop: 6 },
   middleButtons: {
     marginTop: 16,
     marginHorizontal: 16,
@@ -341,14 +318,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 4,
   },
-  bottomButtonTextWhite: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  bottomButtonTextBlue: {
-    color: BLUE,
-    fontSize: 14,
-    fontWeight: '700',
-  },
+  bottomButtonTextWhite: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  bottomButtonTextBlue: { color: BLUE, fontSize: 14, fontWeight: '700' },
 });

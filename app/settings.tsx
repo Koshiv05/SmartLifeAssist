@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppContext } from '../contexts/AppContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import { clearUserSession } from '../services/storage';
 
 export default function SettingsScreen() {
   const {
@@ -16,8 +17,9 @@ export default function SettingsScreen() {
 
   async function handleLogout() {
     try {
-      await signOut(auth);
 
+      await clearUserSession();
+      await signOut(auth);
       router.replace('/login' as any);
     } catch (error) {
       Alert.alert('Logout Error', 'Could not log out.');
