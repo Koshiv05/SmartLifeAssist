@@ -87,7 +87,23 @@ export default function TaskDetailsScreen() {
             <Text style={styles.label}>Due Time</Text>
             <Text style={styles.value}>{dueTime}</Text>
           </View>
-
+          <Pressable
+            style={styles.editButton}
+            onPress={() =>
+              router.push({
+                pathname: '/edit-task' as any,
+                params: {
+                  id,
+                  title,
+                  description,
+                  dueDate,
+                  dueTime,
+                },
+              })
+            }
+          >
+            <Text style={styles.editButtonText}>EDIT TASK</Text>
+          </Pressable>
           <Pressable
             style={styles.deleteButton}
             onPress={confirmDelete}
@@ -184,5 +200,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#222',
+  },
+
+  editButton: {
+    marginTop: 20,
+    backgroundColor: '#1976D2',
+    paddingVertical: 16,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+
+  editButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

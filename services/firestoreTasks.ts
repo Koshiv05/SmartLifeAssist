@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -26,7 +27,7 @@ export async function saveTaskToFirestore(task: Task, userId: string) {
   await addDoc(collection(db, 'tasks'), taskData);
 }
 
-export async function loadTasksFromFirestore(): Promise<Task[]> {
+export async function loadTasksFromFirestore(uid: string): Promise<Task[]> {
   const user = auth.currentUser;
 
   if (!user) {
@@ -58,4 +59,14 @@ export async function loadTasksFromFirestore(): Promise<Task[]> {
 
 export async function deleteTaskFromFirestore(taskId: string) {
   await deleteDoc(doc(db, 'tasks', taskId));
+}
+
+export async function updateTaskInFirestore(task: Task) {
+  await updateDoc(doc(db, 'tasks', task.id), {
+    title: task.title,
+    description: task.description,
+    dueDate: task.dueDate,
+    dueTime: task.dueTime,
+    reminderType: task.reminderType || '',
+  });
 }

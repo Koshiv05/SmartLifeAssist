@@ -16,6 +16,7 @@ export default function RootLayout() {
         <Stack.Screen name="location-settings" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen name="edit-task" options={{ headerShown: false }} />
       </Stack>
     </AppProvider>
   );
