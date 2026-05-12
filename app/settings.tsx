@@ -174,6 +174,14 @@ export default function SettingsScreen() {
           </View>
           <Pressable
             style={[styles.locationButton, { backgroundColor: cardBackground }]}
+            onPress={() => router.push('/motion-sensor' as any)}
+          >
+            <Text style={styles.locationButtonText}>
+              MOTION SENSOR
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.locationButton, { backgroundColor: cardBackground }]}
             onPress={() => router.push('/location-settings' as any)}
           >
             <Text style={styles.locationButtonText}>
