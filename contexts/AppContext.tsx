@@ -3,6 +3,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { Task } from '../types/task';
 import { loadTasksFromFirestore } from '../services/firestoreTasks';
+import { loadTasksFromSQLite, saveTasksToSQLite } from '../services/sqliteTaskService';
 
 type AppContextType = {
   user: User | null;
@@ -33,8 +34,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       const firestoreTasks = await loadTasksFromFirestore(currentUser.uid);
       setTasks(firestoreTasks);
+      saveTasksToSQLite(firestoreTasks);
     } catch (error) {
       console.log('Task refresh failed:', error);
+      const localTasks = loadTasksFromSQLite();
+      setTasks(localTasks);
     }
   }
 
@@ -45,6 +49,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (firebaseUser) {
         const firestoreTasks = await loadTasksFromFirestore(firebaseUser.uid);
         setTasks(firestoreTasks);
+        saveTasksToSQLite(firestoreTasks);
       } else {
         setTasks([]);
       }
