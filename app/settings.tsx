@@ -5,6 +5,8 @@ import { useAppContext } from '../contexts/AppContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { clearUserSession } from '../services/storage';
+import { useEffect, useState } from 'react';
+import { getBatteryInfo } from '../services/batteryService';
 
 export default function SettingsScreen() {
   const {
@@ -14,7 +16,20 @@ export default function SettingsScreen() {
     setDarkMode,
     setLargeText,
   } = useAppContext();
+  useEffect(() => {
+    async function loadBatteryInfo() {
+      try {
+        const batteryInfo = await getBatteryInfo();
 
+        setBatteryPercentage(batteryInfo.percentage);
+        setIsCharging(batteryInfo.isCharging);
+      } catch (error) {
+        console.log('Battery info error:', error);
+      }
+    }
+
+    loadBatteryInfo();
+  }, []);
   async function handleLogout() {
     try {
 
@@ -30,6 +45,8 @@ export default function SettingsScreen() {
   const cardBackground = darkMode ? '#1E1E1E' : '#fff';
   const primaryText = darkMode ? '#fff' : '#222';
   const secondaryText = darkMode ? '#ccc' : '#666';
+  const [batteryPercentage, setBatteryPercentage] = useState(0);
+  const [isCharging, setIsCharging] = useState(false);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: pageBackground }]}>
@@ -114,7 +131,47 @@ export default function SettingsScreen() {
               />
             </View>
           </View>
+          <View style={[styles.card, { backgroundColor: cardBackground }]}>
+            <Text
+              style={[
+                styles.cardTitle,
+                {
+                  color: primaryText,
+                  fontSize: largeText ? 20 : 18,
+                },
+              ]}
+            >
+              Battery Status
+            </Text>
 
+            <Text
+              style={[
+                styles.name,
+                {
+                  color: primaryText,
+                  fontSize: largeText ? 18 : 16,
+                },
+              ]}
+            >
+              Battery: {batteryPercentage}%
+            </Text>
+
+            <Text style={[styles.email, { color: secondaryText }]}>
+              {isCharging ? 'Device is charging' : 'Device is not charging'}
+            </Text>
+
+            {batteryPercentage <= 20 && (
+              <Text
+                style={{
+                  color: '#E53935',
+                  marginTop: 10,
+                  fontWeight: '700',
+                }}
+              >
+                Low battery detected.
+              </Text>
+            )}
+          </View>
           <Pressable
             style={[styles.locationButton, { backgroundColor: cardBackground }]}
             onPress={() => router.push('/location-settings' as any)}
