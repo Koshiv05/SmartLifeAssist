@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Switch, Alert, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppContext } from '../contexts/AppContext';
@@ -55,7 +55,7 @@ export default function SettingsScreen() {
           <Text style={styles.topBarTitle}>Settings</Text>
         </View>
 
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={[styles.card, { backgroundColor: cardBackground }]}>
             <Text style={[styles.cardTitle, { color: primaryText }]}>
               Profile
@@ -211,7 +211,7 @@ export default function SettingsScreen() {
           >
             <Text style={styles.logoutButtonText}>LOG OUT</Text>
           </Pressable>
-        </View>
+        </ScrollView>
 
         <View style={styles.bottomArea}>
           <Pressable
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   content: {
-    flex: 1,
     padding: 16,
+    paddingBottom: 40,
   },
   card: {
     backgroundColor: '#fff',
