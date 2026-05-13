@@ -182,6 +182,14 @@ export default function SettingsScreen() {
           </Pressable>
           <Pressable
             style={[styles.locationButton, { backgroundColor: cardBackground }]}
+            onPress={() => router.push('/parallel-tasks' as any)}
+          >
+            <Text style={styles.locationButtonText}>
+              PARALLEL PROCESSING
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.locationButton, { backgroundColor: cardBackground }]}
             onPress={() => router.push('/location-settings' as any)}
           >
             <Text style={styles.locationButtonText}>

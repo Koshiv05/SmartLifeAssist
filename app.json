@@ -10,13 +10,19 @@
       "backgroundColor": "#9C27B0"
     },
     "android": {
+      "package": "com.smartlifeassist.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#9C27B0"
       }
     },
-    "plugins": [
-      "expo-sqlite"
-    ]
-  }
+    "extra": {
+      "eas": {
+        "projectId": "07ea7680-2c1d-4239-9f3d-3d93e188a45d"
+      }
+    }
+  },
+  "plugins": [
+    "expo-sqlite"
+  ]
 }

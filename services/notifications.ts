@@ -1,32 +1,45 @@
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export async function requestNotificationPermission() {
-  if (!Device.isDevice) return false;
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    return false;
-  }
-
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
+    await Notifications.setNotificationChannelAsync('smartlife-reminders', {
+      name: 'SmartLife Reminders',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: 'default',
     });
   }
+
+  const permission = await Notifications.requestPermissionsAsync();
 
   return true;
 }
 
-export async function scheduleTaskNotification() {
-  console.log('Notifications temporarily disabled in Expo Go');
+export async function scheduleBasicNotification(title: string, body: string) {
+  const hasPermission = await requestNotificationPermission();
+
+  if (!hasPermission) {
+    throw new Error('Notification permission was not granted.');
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      sound: 'default',
+    },
+    trigger: {
+      seconds: 5,
+      channelId: 'smartlife-reminders',
+    } as any,
+  });
 }
