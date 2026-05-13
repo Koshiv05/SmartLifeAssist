@@ -190,6 +190,14 @@ export default function SettingsScreen() {
           </Pressable>
           <Pressable
             style={[styles.locationButton, { backgroundColor: cardBackground }]}
+            onPress={() => router.push('/background-task' as any)}
+          >
+            <Text style={styles.locationButtonText}>
+              WORK MANAGER
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.locationButton, { backgroundColor: cardBackground }]}
             onPress={() => router.push('/location-settings' as any)}
           >
             <Text style={styles.locationButtonText}>

@@ -29,7 +29,7 @@ export default function ParallelTasksScreen() {
           await Promise.all([
             getBatteryInfo(),
             Promise.resolve(loadTasksFromSQLite()),
-            loadTasksFromFirestore(),
+            loadTasksFromFirestore('tasks'),
           ]);
 
         setBattery(batteryInfo.percentage);
