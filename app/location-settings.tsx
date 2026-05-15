@@ -1,16 +1,13 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { getCurrentLocation, CurrentLocation } from '../services/locationService';
-import MapView, { Marker, UrlTile } from 'react-native-maps';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [locationText, setLocationText] = useState('');
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
-
-  const selectedLocation = currentLocation;
 
   async function handleUseCurrentLocation() {
     if (!locationEnabled) {
@@ -51,7 +48,7 @@ export default function LocationSettingsScreen() {
 
           <TextInput
             style={styles.input}
-            placeholder="Select location"
+            placeholder="Selected location"
             placeholderTextColor="#666"
             value={locationText}
             onChangeText={setLocationText}
@@ -68,38 +65,20 @@ export default function LocationSettingsScreen() {
             <Text style={styles.currentLocationText}>USE CURRENT LOCATION</Text>
           </Pressable>
 
-          {selectedLocation && (
+          {currentLocation && (
             <View style={styles.locationPreview}>
               <Text style={styles.locationPreviewTitle}>Current GPS Location</Text>
 
               <Text style={styles.locationPreviewText}>
-                {selectedLocation.address}
+                {currentLocation.address}
               </Text>
 
-              <MapView
-                style={styles.map}
-                mapType={Platform.OS === 'android' ? 'none' : 'standard'}
-                initialRegion={{
-                  latitude: selectedLocation.latitude,
-                  longitude: selectedLocation.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-              >
-                <UrlTile
-                  urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  maximumZ={19}
-                />
-
-                <Marker
-                  coordinate={{
-                    latitude: selectedLocation.latitude,
-                    longitude: selectedLocation.longitude,
-                  }}
-                  title="Current Location"
-                  description={selectedLocation.address}
-                />
-              </MapView>
+              <View style={styles.gpsInfoCard}>
+                <Text style={styles.gpsInfoTitle}>GPS Data Captured</Text>
+                <Text style={styles.gpsInfoText}>
+                  The app used the device GPS sensor and reverse geocoding to detect the current location.
+                </Text>
+              </View>
             </View>
           )}
         </View>
@@ -181,26 +160,37 @@ const styles = StyleSheet.create({
   locationPreview: {
     backgroundColor: '#fff',
     marginTop: 14,
-    padding: 14,
+    padding: 16,
     borderRadius: 4,
     elevation: 2,
   },
   locationPreviewTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
     color: '#222',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   locationPreviewText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#444',
-    marginTop: 4,
+    lineHeight: 24,
   },
-  map: {
-    height: 220,
-    marginTop: 14,
+  gpsInfoCard: {
+    marginTop: 16,
+    backgroundColor: '#F5F5F5',
+    padding: 14,
     borderRadius: 4,
-    overflow: 'hidden',
+  },
+  gpsInfoTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 6,
+  },
+  gpsInfoText: {
+    fontSize: 13,
+    color: '#555',
+    lineHeight: 20,
   },
   bottomArea: {
     paddingHorizontal: 16,
