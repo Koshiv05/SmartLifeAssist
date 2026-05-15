@@ -20,6 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="motion-sensor" options={{ headerShown: false }} />
         <Stack.Screen name="parallel-tasks" options={{ headerShown: false }} />
         <Stack.Screen name="background-task" options={{ headerShown: false }} />
+        <Stack.Screen name="admob-demo" options={{ headerShown: false }} />
       </Stack>
     </AppProvider>
   );

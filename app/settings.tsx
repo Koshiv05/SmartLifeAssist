@@ -198,6 +198,14 @@ export default function SettingsScreen() {
           </Pressable>
           <Pressable
             style={[styles.locationButton, { backgroundColor: cardBackground }]}
+            onPress={() => router.push('/admob-demo' as any)}
+          >
+            <Text style={styles.locationButtonText}>
+              ADMOB DEMO
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.locationButton, { backgroundColor: cardBackground }]}
             onPress={() => router.push('/location-settings' as any)}
           >
             <Text style={styles.locationButtonText}>
