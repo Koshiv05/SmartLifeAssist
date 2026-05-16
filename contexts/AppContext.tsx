@@ -11,6 +11,7 @@ type AppContextType = {
   darkMode: boolean;
   largeText: boolean;
   refreshTasks: () => Promise<void>;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   setDarkMode: (value: boolean) => void;
   setLargeText: (value: boolean) => void;
 };
@@ -66,6 +67,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         darkMode,
         largeText,
         refreshTasks,
+        setTasks,
         setDarkMode,
         setLargeText,
       }}

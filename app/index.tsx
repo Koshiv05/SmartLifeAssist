@@ -31,7 +31,11 @@ export default function MainScreen() {
     checkSession();
   }, []);
 
-  const latestTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
+  const sortedTasks = [...tasks].sort((a: any, b: any) => {
+    return (b.createdAtMs || 0) - (a.createdAtMs || 0);
+  });
+
+  const latestTask = sortedTasks.length > 0 ? sortedTasks[0] : null;
 
   useEffect(() => {
     async function loadHomeAiSuggestion() {
@@ -204,7 +208,7 @@ export default function MainScreen() {
               </Text>
             </View>
           ) : (
-            tasks.map((task) => (
+            sortedTasks.map((task) => (
               <Pressable
                 key={task.id}
                 style={[styles.listCard, { backgroundColor: cardBackground }]}

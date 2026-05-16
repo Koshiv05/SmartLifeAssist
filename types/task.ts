@@ -5,4 +5,6 @@ export type Task = {
   dueDate: string;
   dueTime: string;
   reminderType?: 'time' | 'location' | '';
+  createdAtMs?: number;
+  updatedAtMs?: number;
 };

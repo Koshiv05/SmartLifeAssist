@@ -51,6 +51,7 @@ export async function loadTasksFromFirestore(uid: string): Promise<Task[]> {
       dueDate: data.dueDate,
       dueTime: data.dueTime,
       reminderType: (data.reminderType || '') as Task['reminderType'],
+      createdAtMs: data.createdAtMs || 0,
     };
   });
 

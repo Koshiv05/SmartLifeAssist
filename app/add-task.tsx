@@ -12,7 +12,7 @@ export default function AddTaskScreen() {
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
-  const { user, refreshTasks } = useAppContext();
+  const { user, refreshTasks, setTasks } = useAppContext();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -51,11 +51,11 @@ export default function AddTaskScreen() {
       Alert.alert('Missing information', 'Please complete all fields before saving.');
       return;
     }
-if (!user) {
-  Alert.alert('Login required', 'Please login again before saving tasks.');
-  router.replace('/login' as any);
-  return;
-}
+    if (!user) {
+      Alert.alert('Login required', 'Please login again before saving tasks.');
+      router.replace('/login' as any);
+      return;
+    }
     try {
       const newTask: Task = {
         id: Date.now().toString(),
@@ -64,10 +64,12 @@ if (!user) {
         dueDate,
         dueTime,
         reminderType: '',
+        createdAtMs: Date.now(),
       };
 
+      setTasks((prev) => [newTask, ...prev]);
+
       await saveTaskToFirestore(newTask, user.uid);
-      await refreshTasks();
 
       setTitle('');
       setDescription('');
