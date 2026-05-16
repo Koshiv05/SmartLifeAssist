@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { getCurrentLocation, CurrentLocation } from '../services/locationService';
+import MapView, { Marker } from 'react-native-maps';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
@@ -79,6 +80,23 @@ export default function LocationSettingsScreen() {
                   The app used the device GPS sensor and reverse geocoding to detect the current location.
                 </Text>
               </View>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: currentLocation.latitude,
+                    longitude: currentLocation.longitude,
+                  }}
+                  title="Current Location"
+                />
+              </MapView>
             </View>
           )}
         </View>
@@ -181,6 +199,12 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 4,
   },
+  map: {
+  width: '100%',
+  height: 220,
+  marginTop: 16,
+  borderRadius: 6,
+},
   gpsInfoTitle: {
     fontSize: 14,
     fontWeight: '700',
