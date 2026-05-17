@@ -1,11 +1,20 @@
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
+import * as Notifications from 'expo-notifications';
 
 const BACKGROUND_TASK_NAME = 'smartlife-background-task';
 
 TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
   try {
     console.log('Background task executed');
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Background Task Running',
+        body: 'SmartLife Assist background task executed successfully.',
+      },
+      trigger: null,
+    });
 
     return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {
@@ -23,7 +32,10 @@ export async function registerBackgroundTask() {
       status === BackgroundFetch.BackgroundFetchStatus.Restricted ||
       status === BackgroundFetch.BackgroundFetchStatus.Denied
     ) {
-      return false;
+      return {
+        success: false,
+        message: 'Background fetch permission denied.',
+      };
     }
 
     const isRegistered =
@@ -42,10 +54,22 @@ export async function registerBackgroundTask() {
       );
     }
 
-    return true;
+    return {
+      success: true,
+      message: 'Background task registered successfully.',
+    };
   } catch (error) {
     console.log('Register task error:', error);
 
-    return false;
+    return {
+      success: false,
+      message: 'Could not register background task.',
+    };
   }
+}
+
+export async function checkTaskStatus() {
+  return await TaskManager.isTaskRegisteredAsync(
+    BACKGROUND_TASK_NAME
+  );
 }

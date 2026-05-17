@@ -9,21 +9,44 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
-import { registerBackgroundTask } from '../services/backgroundTaskService';
+import { useState, useEffect } from 'react';
+
+import {
+  registerBackgroundTask,
+  checkTaskStatus,
+} from '../services/backgroundTaskService';
 
 export default function BackgroundTaskScreen() {
-  async function handleRegisterTask() {
-    const success = await registerBackgroundTask();
+  const [taskStatus, setTaskStatus] = useState(
+    'Task not registered'
+  );
 
-    if (success) {
+  useEffect(() => {
+    async function loadTaskStatus() {
+      const registered = await checkTaskStatus();
+
+      if (registered) {
+        setTaskStatus('Background task is active');
+      }
+    }
+
+    loadTaskStatus();
+  }, []);
+
+  async function handleRegisterTask() {
+    const result = await registerBackgroundTask();
+
+    if (result.success) {
+      setTaskStatus('Background task is active');
+
       Alert.alert(
         'Task Manager Active',
-        'Background task registered successfully.'
+        result.message
       );
     } else {
       Alert.alert(
         'Task Manager Error',
-        'Could not register background task.'
+        result.message
       );
     }
   }
@@ -44,6 +67,16 @@ export default function BackgroundTaskScreen() {
             Background Fetch APIs.
           </Text>
 
+          <View style={styles.statusCard}>
+            <Text style={styles.statusTitle}>
+              Registration Status
+            </Text>
+
+            <Text style={styles.statusText}>
+              {taskStatus}
+            </Text>
+          </View>
+
           <Pressable
             style={styles.button}
             onPress={handleRegisterTask}
@@ -59,7 +92,9 @@ export default function BackgroundTaskScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>BACK</Text>
+            <Text style={styles.backButtonText}>
+              BACK
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -104,8 +139,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 26,
     color: '#333',
-    marginBottom: 30,
+    marginBottom: 24,
     textAlign: 'center',
+  },
+
+  statusCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 6,
+    marginBottom: 24,
+    elevation: 2,
+  },
+
+  statusTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 8,
+  },
+
+  statusText: {
+    fontSize: 15,
+    color: '#4CAF50',
+    fontWeight: '600',
   },
 
   button: {
