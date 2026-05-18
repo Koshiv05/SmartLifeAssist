@@ -31,6 +31,7 @@
       "expo-sqlite",
       "expo-task-manager",
       "expo-background-fetch"
+      
     ],
 
     "extra": {
