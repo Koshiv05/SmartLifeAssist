@@ -24,6 +24,7 @@ export default function AdmobDemoScreen() {
             within the SmartLife Assist application.
           </Text>
 
+          {/* Sample banner ad preview */}
           <View style={styles.adContainer}>
             <Text style={styles.adLabel}>
               SAMPLE BANNER AD
