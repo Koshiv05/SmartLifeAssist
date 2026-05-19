@@ -1,21 +1,33 @@
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, Platform } from 'react-native';
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Alert,
+  Platform,
+} from 'react-native';
+
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Task } from '../types/task';
 import { saveTaskToFirestore } from '../services/firestoreTasks';
 import { useAppContext } from '../contexts/AppContext';
 
 export default function AddTaskScreen() {
+  const { user, setTasks } = useAppContext();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
-  const { user, refreshTasks, setTasks } = useAppContext();
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // Format selected date for display
   function formatDate(date: Date) {
     return date.toLocaleDateString('en-AU', {
       day: '2-digit',
@@ -24,6 +36,7 @@ export default function AddTaskScreen() {
     });
   }
 
+  // Format selected time for display
   function formatTime(date: Date) {
     return date.toLocaleTimeString('en-AU', {
       hour: '2-digit',
@@ -32,30 +45,52 @@ export default function AddTaskScreen() {
     });
   }
 
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
+  function handleDateChange(
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) {
     setShowDatePicker(false);
+
     if (event.type === 'set' && selectedDate) {
       setDueDate(formatDate(selectedDate));
     }
   }
 
-  function handleTimeChange(event: DateTimePickerEvent, selectedTime?: Date) {
+  function handleTimeChange(
+    event: DateTimePickerEvent,
+    selectedTime?: Date
+  ) {
     setShowTimePicker(false);
+
     if (event.type === 'set' && selectedTime) {
       setDueTime(formatTime(selectedTime));
     }
   }
 
   async function handleSave() {
-    if (!title.trim() || !description.trim() || !dueDate.trim() || !dueTime.trim()) {
-      Alert.alert('Missing information', 'Please complete all fields before saving.');
+    if (
+      !title.trim() ||
+      !description.trim() ||
+      !dueDate.trim() ||
+      !dueTime.trim()
+    ) {
+      Alert.alert(
+        'Missing information',
+        'Please complete all fields before saving.'
+      );
       return;
     }
+
     if (!user) {
-      Alert.alert('Login required', 'Please login again before saving tasks.');
+      Alert.alert(
+        'Login required',
+        'Please login again before saving tasks.'
+      );
+
       router.replace('/login' as any);
       return;
     }
+
     try {
       const newTask: Task = {
         id: Date.now().toString(),
@@ -67,6 +102,7 @@ export default function AddTaskScreen() {
         createdAtMs: Date.now(),
       };
 
+      // Instantly update UI using Context API
       setTasks((prev) => [newTask, ...prev]);
 
       await saveTaskToFirestore(newTask, user.uid);
@@ -77,12 +113,9 @@ export default function AddTaskScreen() {
       setDueTime('');
 
       Alert.alert('Success', 'Task saved successfully.');
+
       router.back();
-    }
-
-    catch (error: any) {
-      console.log('Firestore save error:', error);
-
+    } catch (error: any) {
       Alert.alert(
         'Task not saved',
         error?.message || 'Unknown Firebase error'
@@ -91,7 +124,10 @@ export default function AddTaskScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={['top', 'left', 'right', 'bottom']}
+    >
       <View style={styles.container}>
         <View style={styles.topBar}>
           <Text style={styles.topBarTitle}>Add Task</Text>
@@ -116,14 +152,26 @@ export default function AddTaskScreen() {
             onChangeText={setDescription}
           />
 
-          <Pressable style={styles.pickerCard} onPress={() => setShowDatePicker(true)}>
+          <Pressable
+            style={styles.pickerCard}
+            onPress={() => setShowDatePicker(true)}
+          >
             <Text style={styles.pickerLabel}>Due Date</Text>
-            <Text style={styles.pickerValue}>{dueDate || 'Select date'}</Text>
+
+            <Text style={styles.pickerValue}>
+              {dueDate || 'Select date'}
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.pickerCard} onPress={() => setShowTimePicker(true)}>
+          <Pressable
+            style={styles.pickerCard}
+            onPress={() => setShowTimePicker(true)}
+          >
             <Text style={styles.pickerLabel}>Due Time</Text>
-            <Text style={styles.pickerValue}>{dueTime || 'Select time'}</Text>
+
+            <Text style={styles.pickerValue}>
+              {dueTime || 'Select time'}
+            </Text>
           </Pressable>
 
           {showDatePicker && (
@@ -146,11 +194,17 @@ export default function AddTaskScreen() {
         </View>
 
         <View style={styles.bottomButtons}>
-          <Pressable style={styles.saveButton} onPress={handleSave}>
+          <Pressable
+            style={styles.saveButton}
+            onPress={handleSave}
+          >
             <Text style={styles.buttonText}>SAVE</Text>
           </Pressable>
 
-          <Pressable style={styles.cancelButton} onPress={() => router.back()}>
+          <Pressable
+            style={styles.cancelButton}
+            onPress={() => router.back()}
+          >
             <Text style={styles.buttonText}>CANCEL</Text>
           </Pressable>
         </View>
