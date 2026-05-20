@@ -1,4 +1,4 @@
-const GEMINI_API_KEY = 'AIzaSyBV1FIbD4LEuubfGYCAyUpf-WgzXZ5KnAE';
+const GEMINI_API_KEY = 'YOUR-API-KEY';
 
 const fallbackSuggestions = [
     'Break this task into smaller steps.',
