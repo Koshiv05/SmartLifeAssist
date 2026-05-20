@@ -4,6 +4,7 @@ const fallbackSuggestions = [
   'Finish the most important part first.',
 ];
 
+// Function to get a fallback suggestion by index
 function getFallbackSuggestion(index: number) {
   return fallbackSuggestions[index];
 }

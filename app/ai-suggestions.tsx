@@ -41,6 +41,7 @@ export default function AiSuggestionsScreen() {
               text: 'No tasks found. Add tasks to receive AI productivity suggestions.',
             });
           } else {
+            // Generate suggestions for latest tasks
             const limitedTasks = tasks.slice(0, 3);
 
             for (const task of limitedTasks) {

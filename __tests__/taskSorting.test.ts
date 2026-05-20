@@ -4,6 +4,7 @@ type TestTask = {
   createdAtMs: number;
 };
 
+// Function to sort tasks by newest first
 function sortTasksNewestFirst(tasks: TestTask[]) {
   return [...tasks].sort((a, b) => b.createdAtMs - a.createdAtMs);
 }

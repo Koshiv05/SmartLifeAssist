@@ -1,18 +1,32 @@
-import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebase';
+
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+
 import { router } from 'expo-router';
+
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
+import { auth } from '../services/firebase';
 import { saveUserSession } from '../services/storage';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Handle user login
   async function handleLogin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert('Success', 'Logged in successfully');
+
+      // Save user session and navigate to home
       await saveUserSession(email.trim());
       router.replace('/' as any);
     } catch (error: any) {

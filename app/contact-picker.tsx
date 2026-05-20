@@ -1,15 +1,32 @@
-import { View, Text, StyleSheet, Pressable, Switch, TextInput, Alert, ScrollView } from 'react-native';
+import { useCallback, useState } from 'react';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Switch,
+  TextInput,
+  Alert,
+  ScrollView,
+} from 'react-native';
+
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCallback, useState } from 'react';
+
 import { EmergencyContact } from '../types/contact';
-import { loadEmergencyContacts, saveEmergencyContacts } from '../services/contactStorage';
+
+import {
+  loadEmergencyContacts,
+  saveEmergencyContacts,
+} from '../services/contactStorage';
 
 export default function ContactPickerScreen() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
+  // Load saved contacts whenever the screen becomes active
   useFocusEffect(
     useCallback(() => {
       async function fetchContacts() {
@@ -44,6 +61,7 @@ export default function ContactPickerScreen() {
     Alert.alert('Contact added', 'Emergency contact has been added successfully.');
   }
 
+  // Toggle contact selection for emergency alerts
   async function handleToggleContact(contactId: string) {
     const updatedContacts = contacts.map((contact) =>
       contact.id === contactId
@@ -52,6 +70,7 @@ export default function ContactPickerScreen() {
     );
 
     setContacts(updatedContacts);
+    // Save updated contact list locally
     await saveEmergencyContacts(updatedContacts);
   }
 

@@ -1,9 +1,27 @@
-import { View, Text, StyleSheet, Pressable, Alert, ScrollView, Share } from 'react-native';
+import { useState } from 'react';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  ScrollView,
+  Share,
+} from 'react-native';
+
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
-import { CurrentLocation, getCurrentLocation } from '../services/locationService';
-import { loadEmergencyContacts } from '../services/contactStorage';
+
+import {
+  CurrentLocation,
+  getCurrentLocation,
+} from '../services/locationService';
+
+import {
+  loadEmergencyContacts,
+} from '../services/contactStorage';
+
 import { EmergencyContact } from '../types/contact';
 
 export default function EmergencyScreen() {
@@ -12,12 +30,14 @@ export default function EmergencyScreen() {
   const [selectedContacts, setSelectedContacts] = useState<EmergencyContact[]>([]);
   const [preparedMessage, setPreparedMessage] = useState('');
 
+  // Prepare emergency alert with current GPS location
   async function handleAlert() {
     try {
       setIsLoadingLocation(true);
 
       const location = await getCurrentLocation();
       const contacts = await loadEmergencyContacts();
+      // Filter only contacts selected for emergency alerts
       const enabledContacts = contacts.filter((contact) => contact.selected);
 
       const message =
@@ -44,6 +64,7 @@ export default function EmergencyScreen() {
     }
   }
 
+  // Share prepared emergency message using device share options
   async function handleShareAlert() {
     if (!preparedMessage) {
       Alert.alert('No alert prepared', 'Please press Send Alert first.');

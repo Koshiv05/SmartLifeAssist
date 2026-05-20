@@ -1,3 +1,4 @@
+// Unit tests for task validation logic
 describe('Task Validation', () => {
   test('Task title should not be empty', () => {
     const title = 'Buy groceries';

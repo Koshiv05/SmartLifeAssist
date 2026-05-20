@@ -1,15 +1,31 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Switch, Alert } from 'react-native';
+import { useState } from 'react';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  Switch,
+  Alert,
+} from 'react-native';
+
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
-import { getCurrentLocation, CurrentLocation } from '../services/locationService';
+
 import MapView, { Marker } from 'react-native-maps';
+
+import {
+  getCurrentLocation,
+  CurrentLocation,
+} from '../services/locationService';
 
 export default function LocationSettingsScreen() {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [locationText, setLocationText] = useState('');
   const [currentLocation, setCurrentLocation] = useState<CurrentLocation | null>(null);
 
+  // Get current GPS location from device and reverse geocode to address
   async function handleUseCurrentLocation() {
     if (!locationEnabled) {
       Alert.alert('Location disabled', 'Please enable location before using GPS.');
@@ -18,6 +34,7 @@ export default function LocationSettingsScreen() {
 
     try {
       const location = await getCurrentLocation();
+      // Save detected GPS location for preview
       setCurrentLocation(location);
       setLocationText(location.address);
       Alert.alert('Location found', 'Current location has been added.');
@@ -200,11 +217,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   map: {
-  width: '100%',
-  height: 220,
-  marginTop: 16,
-  borderRadius: 6,
-},
+    width: '100%',
+    height: 220,
+    marginTop: 16,
+    borderRadius: 6,
+  },
   gpsInfoTitle: {
     fontSize: 14,
     fontWeight: '700',

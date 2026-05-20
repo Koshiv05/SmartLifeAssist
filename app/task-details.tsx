@@ -6,12 +6,18 @@ import {
   Alert,
 } from 'react-native';
 
-import { useLocalSearchParams, router } from 'expo-router';
+import {
+  useLocalSearchParams,
+  router,
+} from 'expo-router';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { deleteTaskFromFirestore } from '../services/firestoreTasks';
+
 import { useAppContext } from '../contexts/AppContext';
 
+// Task Details Screen - View, Edit, Delete
 export default function TaskDetailsScreen() {
   const { refreshTasks } = useAppContext();
 
@@ -29,6 +35,7 @@ export default function TaskDetailsScreen() {
     dueTime: string;
   }>();
 
+  // Handle task deletion with confirmation
   async function handleDeleteTask() {
     try {
       if (!id) {
@@ -36,6 +43,7 @@ export default function TaskDetailsScreen() {
         return;
       }
 
+      // Delete task from Firestore
       await deleteTaskFromFirestore(id);
 
       await refreshTasks();
@@ -48,6 +56,7 @@ export default function TaskDetailsScreen() {
     }
   }
 
+  // Confirm task deletion
   function confirmDelete() {
     Alert.alert(
       'Delete Task',

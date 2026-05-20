@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import {
   View,
   Text,
@@ -6,13 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { useEffect, useState } from 'react';
-
 import { router } from 'expo-router';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getBatteryInfo } from '../services/batteryService';
+
 import { loadTasksFromSQLite } from '../services/sqliteTaskService';
+
 import { loadTasksFromFirestore } from '../services/firestoreTasks';
 
 export default function ParallelTasksScreen() {
@@ -22,9 +25,11 @@ export default function ParallelTasksScreen() {
   const [sqliteCount, setSqliteCount] = useState(0);
   const [firestoreCount, setFirestoreCount] = useState(0);
 
+  // Load battery info, SQLite tasks, and Firestore tasks in parallel
   useEffect(() => {
     async function loadParallelData() {
       try {
+        // Use Promise.all to load all data sources at the same time
         const [batteryInfo, sqliteTasks, firestoreTasks] =
           await Promise.all([
             getBatteryInfo(),
@@ -32,11 +37,13 @@ export default function ParallelTasksScreen() {
             loadTasksFromFirestore('tasks'),
           ]);
 
+        // Update state with loaded data
         setBattery(batteryInfo.percentage);
         setSqliteCount(sqliteTasks.length);
         setFirestoreCount(firestoreTasks.length);
       } catch (error) {
-        console.log('Parallel processing error:', error);
+        setSqliteCount(0);
+        setFirestoreCount(0);
       } finally {
         setLoading(false);
       }

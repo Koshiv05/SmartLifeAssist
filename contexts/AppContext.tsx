@@ -1,9 +1,28 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
+
 import { auth } from '../services/firebase';
+
 import { Task } from '../types/task';
-import { loadTasksFromFirestore } from '../services/firestoreTasks';
-import { loadTasksFromSQLite, saveTasksToSQLite } from '../services/sqliteTaskService';
+
+import {
+  loadTasksFromFirestore,
+} from '../services/firestoreTasks';
+
+import {
+  loadTasksFromSQLite,
+  saveTasksToSQLite,
+} from '../services/sqliteTaskService';
 
 type AppContextType = {
   user: User | null;
@@ -16,6 +35,7 @@ type AppContextType = {
   setLargeText: (value: boolean) => void;
 };
 
+// Global application state shared across screens
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -24,6 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [largeText, setLargeText] = useState(false);
 
+  // Reload latest task data from Firestore
   async function refreshTasks() {
     try {
       const currentUser = auth.currentUser;
@@ -37,12 +58,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setTasks(firestoreTasks);
       saveTasksToSQLite(firestoreTasks);
     } catch (error) {
-      console.log('Task refresh failed:', error);
+      // Load locally saved tasks if Firestore fails
       const localTasks = loadTasksFromSQLite();
       setTasks(localTasks);
     }
   }
 
+  // Monitor Firebase login/logout state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);

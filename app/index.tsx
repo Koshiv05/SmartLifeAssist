@@ -1,10 +1,20 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+} from 'react-native';
+
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Task } from '../types/task';
+
 import { useAppContext } from '../contexts/AppContext';
+
 import { loadUserSession } from '../services/storage';
 import { generateTaskSuggestion } from '../services/aiService';
 
@@ -16,6 +26,7 @@ export default function MainScreen() {
     'Add a task to receive an AI suggestion.'
   );
 
+  // Check if user session already exists when app loads
   useEffect(() => {
     async function checkSession() {
       const savedSession = await loadUserSession();
@@ -31,12 +42,14 @@ export default function MainScreen() {
     checkSession();
   }, []);
 
+  // Load AI suggestion based on latest task
   const sortedTasks = [...tasks].sort((a: any, b: any) => {
     return (b.createdAtMs || 0) - (a.createdAtMs || 0);
   });
 
   const latestTask = sortedTasks.length > 0 ? sortedTasks[0] : null;
 
+  // Load AI suggestion based on latest task
   useEffect(() => {
     async function loadHomeAiSuggestion() {
       if (!latestTask) {
@@ -55,6 +68,7 @@ export default function MainScreen() {
     return null;
   }
 
+  // Open selected task details screen
   function openTaskDetails(task: Task) {
     router.push({
       pathname: '/task-details' as any,

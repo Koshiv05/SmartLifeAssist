@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import {
   View,
   Text,
@@ -5,11 +7,10 @@ import {
   Pressable,
 } from 'react-native';
 
-import { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 
 import { Accelerometer } from 'expo-sensors';
 
-import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MotionSensorScreen() {
@@ -21,12 +22,14 @@ export default function MotionSensorScreen() {
 
   const [movementDetected, setMovementDetected] = useState(false);
 
+  // Set up accelerometer listener on component mount
   useEffect(() => {
     Accelerometer.setUpdateInterval(500);
 
     const subscription = Accelerometer.addListener((accelerometerData) => {
       setData(accelerometerData);
 
+      // Calculate movement level based on accelerometer data
       const movementLevel =
         Math.abs(accelerometerData.x) +
         Math.abs(accelerometerData.y) +

@@ -1,11 +1,27 @@
-import { View, Text, StyleSheet, Pressable, Switch, Alert, ScrollView } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAppContext } from '../contexts/AppContext';
-import { signOut } from 'firebase/auth';
-import { auth } from '../services/firebase';
-import { clearUserSession } from '../services/storage';
 import { useEffect, useState } from 'react';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Switch,
+  Alert,
+  ScrollView,
+} from 'react-native';
+
+import { router } from 'expo-router';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { signOut } from 'firebase/auth';
+
+import { useAppContext } from '../contexts/AppContext';
+
+import { auth } from '../services/firebase';
+
+import { clearUserSession } from '../services/storage';
+
 import { getBatteryInfo } from '../services/batteryService';
 
 export default function SettingsScreen() {
@@ -16,11 +32,13 @@ export default function SettingsScreen() {
     setDarkMode,
     setLargeText,
   } = useAppContext();
+  // Load current battery information from device
   useEffect(() => {
     async function loadBatteryInfo() {
       try {
         const batteryInfo = await getBatteryInfo();
 
+        // Update battery details for display
         setBatteryPercentage(batteryInfo.percentage);
         setIsCharging(batteryInfo.isCharging);
       } catch (error) {
@@ -30,10 +48,12 @@ export default function SettingsScreen() {
 
     loadBatteryInfo();
   }, []);
+  // Sign out user and clear saved session
   async function handleLogout() {
     try {
 
       await clearUserSession();
+      // Sign out from Firebase
       await signOut(auth);
       router.replace('/login' as any);
     } catch (error) {

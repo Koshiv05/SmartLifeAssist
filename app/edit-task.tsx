@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   View,
   Text,
@@ -8,9 +10,12 @@ import {
   ScrollView,
 } from 'react-native';
 
-import { useLocalSearchParams, router } from 'expo-router';
+import {
+  useLocalSearchParams,
+  router,
+} from 'expo-router';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
 
 import { updateTaskInFirestore } from '../services/firestoreTasks';
 import { useAppContext } from '../contexts/AppContext';
@@ -18,6 +23,7 @@ import { useAppContext } from '../contexts/AppContext';
 export default function EditTaskScreen() {
   const { refreshTasks } = useAppContext();
 
+  // Receive existing task details from route parameters
   const params = useLocalSearchParams<{
     id: string;
     title: string;
@@ -31,6 +37,7 @@ export default function EditTaskScreen() {
   const [dueDate, setDueDate] = useState(params.dueDate || '');
   const [dueTime, setDueTime] = useState(params.dueTime || '');
 
+  // Update task details in Firestore and refresh task list
   async function handleUpdateTask() {
     try {
       if (!title.trim()) {
@@ -47,6 +54,7 @@ export default function EditTaskScreen() {
         reminderType: '',
       });
 
+      // Refresh task list after updating
       await refreshTasks();
 
       Alert.alert('Success', 'Task updated successfully.');

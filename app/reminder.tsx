@@ -7,11 +7,13 @@ import {
 } from 'react-native';
 
 import { router } from 'expo-router';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { scheduleBasicNotification } from '../services/notifications';
 
 export default function ReminderScreen() {
+  // Schedules a local notification to appear after 5 seconds
   async function handleReminder() {
     try {
       await scheduleBasicNotification(
